@@ -82,13 +82,13 @@ public class DashBoardServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("studentId") == null) {
-            response.sendRedirect("index.html");
+            response.sendRedirect("index.jsp");
             return;
         }
 
         String studentId = (String) session.getAttribute("studentId");
 
-        // TEXT DATA
+        
         String branch = request.getParameter("branch");
         String semester = request.getParameter("semester");
         String tenth = request.getParameter("tenth");
@@ -96,9 +96,9 @@ public class DashBoardServlet extends HttpServlet {
         String cgpa = request.getParameter("cgpa");
         String codingLevel = request.getParameter("codingLevel");
         String goal = request.getParameter("goal");
-        String interest = request.getParameter("interest");
+        //String interest = request.getParameter("interest");
 
-        // IMAGE UPLOAD
+       
         Part filePart = request.getPart("photo");
         String fileName = filePart != null ? filePart.getSubmittedFileName() : null;
 
@@ -111,7 +111,7 @@ public class DashBoardServlet extends HttpServlet {
             session.setAttribute("photo", fileName);
         }
 
-        // DB CONNECTION
+      
         MongoClient client = MongoClients.create("mongodb://localhost:27017");
         MongoDatabase db = client.getDatabase("electiveDB");
         MongoCollection<Document> col = db.getCollection("student_profile");
@@ -124,10 +124,10 @@ public class DashBoardServlet extends HttpServlet {
                 .append("cgpa", cgpa)
                 .append("codingLevel", codingLevel)
                 .append("goal", goal)
-                .append("interest", interest)
+                //.append("interest", interest)
                 .append("photo", fileName);
 
-        // UPDATE OR INSERT
+        
         col.replaceOne(eq("studentId", studentId), doc, new com.mongodb.client.model.ReplaceOptions().upsert(true));
 
         response.sendRedirect("dashboard.jsp");

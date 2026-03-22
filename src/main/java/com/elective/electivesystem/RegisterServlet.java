@@ -66,7 +66,7 @@ import org.bson.Document;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
-    // SHA-256 hashing
+    
     private String hashPassword(String password) throws Exception {
         java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(password.getBytes());
@@ -92,7 +92,6 @@ public class RegisterServlet extends HttpServlet {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("users");
 
-            // check if user already exists
             Document existingUser = col.find(new Document("studentId", studentId)).first();
 
             if (existingUser != null) {
@@ -108,7 +107,7 @@ public class RegisterServlet extends HttpServlet {
 
             client.close();
 
-            response.sendRedirect("index.html");
+            response.sendRedirect("index.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();

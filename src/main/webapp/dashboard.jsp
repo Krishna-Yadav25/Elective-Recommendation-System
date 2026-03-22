@@ -11,7 +11,7 @@
     String studentId = (String) session.getAttribute("studentId");
 
     if(name == null){
-        response.sendRedirect("index.jsp");   // FIXED
+        response.sendRedirect("index.jsp");
         return;
     }
 %>
@@ -20,7 +20,7 @@
 <html>
 <head>
     <title>Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css?v=3">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 
 <body>
@@ -32,7 +32,6 @@
     <div class="right-section">
         <span>Welcome, <%= name %></span>
 
-        <!-- 3 DOT MENU -->
         <div class="menu-container">
             <button onclick="toggleMenu()">⋮</button>
 
@@ -47,7 +46,7 @@
 <!-- ================= MAIN ================= -->
 <div class="main">
 
-    <!-- ===== PROFILE CARD ===== -->
+    <!-- PROFILE -->
     <div class="profile-card">
         <img src="images/default.jpeg" class="profile-pic">
         <h3><%= name %></h3>
@@ -56,20 +55,19 @@
         <p>Branch: CSE</p>
     </div>
 
-    <!-- ===== DASHBOARD CONTENT ===== -->
+    <!-- DASHBOARD -->
     <div class="dashboard">
 
         <!-- MENU -->
         <div class="menu">
             <button onclick="showSection('academic')">Academic</button>
-            <button onclick="showSection('interest')">Interest</button>
             <button onclick="showSection('recommend')">Recommend</button>
         </div>
 
         <!-- CONTENT -->
         <div class="content">
 
-            <!-- ================= ACADEMIC ================= -->
+            <!-- ===== ACADEMIC ===== -->
             <div id="academic" class="section active">
                 <h3>Academic Details</h3>
 
@@ -84,15 +82,15 @@
                     <input type="number" step="0.01" name="cgpa" placeholder="CGPA" required>
 
                     <select name="codingLevel">
-                        <option>Beginner</option>
-                        <option>Intermediate</option>
-                        <option>Advanced</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
                     </select>
 
                     <select name="goal">
-                        <option>Placement</option>
-                        <option>Higher Studies</option>
-                        <option>Startup</option>
+                        <option value="Placement">Placement</option>
+                        <option value="Higher Studies">Higher Studies</option>
+                        <option value="Startup">Startup</option>
                     </select>
 
                     <input type="file" name="photo">
@@ -101,43 +99,20 @@
                 </form>
             </div>
 
-            <!-- ================= INTEREST ================= -->
-            <div id="interest" class="section">
-                <h3>Interest</h3>
-
-                <form action="<%= request.getContextPath() %>/dashboard" method="post">
-
-                    <select name="interest" required>
-                        <option value="">Select Interest</option>
-                        <option>AI</option>
-                        <option>Web Development</option>
-                        <option>Cyber Security</option>
-                        <option>Data Science</option>
-                        <option>Mobile App Development</option>
-                        <option>Cloud Computing</option>
-                        <option>Game Development</option>
-                        <option>Blockchain Development</option>
-                    </select>
-
-                    <button type="submit">Save</button>
-                </form>
-            </div>
-
-            <!-- ================= RECOMMEND ================= -->
+            <!-- ===== RECOMMEND ===== -->
             <div id="recommend" class="section">
                 <h3>Recommendation</h3>
 
-                <!-- ✅ FIXED: NOW PASSING DATA -->
                 <form action="<%= request.getContextPath() %>/recommend" method="post">
 
                     <!-- Interest -->
                     <select name="interest" required>
                         <option value="">Select Interest</option>
-                        <option>AI</option>
-                        <option>Web Development</option>
-                        <option>Cyber Security</option>
-                        <option>Data Science</option>
-                        <option>Emerging Tech</option>
+                        <option value="AI">AI</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="Cyber Security">Cyber Security</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Emerging Tech">Emerging Tech</option>
                     </select>
 
                     <!-- CGPA -->
@@ -153,7 +128,7 @@
 
 </div>
 
-<script src="dashboard.js?v=3"></script>
+<script src="dashboard.js"></script>
 
 </body>
 </html>
