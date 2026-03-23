@@ -3,7 +3,6 @@
     Created on : 21 Mar 2026, 3:40:00 pm
     Author     : krish
 --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*" %>
 
@@ -24,7 +23,7 @@
             margin: 80px auto;
             padding: 30px;
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border-radius: 15px;
             text-align: center;
             color: white;
@@ -73,6 +72,12 @@
         .empty {
             color: #ffcccc;
         }
+
+        .count {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ddd;
+        }
     </style>
 </head>
 
@@ -89,9 +94,14 @@
             if (recs != null && !recs.isEmpty()) {
                 for (String r : recs) {
         %>
-            <li><%= r %></li>
+            <li>📘 <%= r %></li>
         <%
                 }
+        %>
+            <div class="count">
+                Total Recommendations: <%= recs.size() %>
+            </div>
+        <%
             } else {
         %>
             <li class="empty">No recommendations available</li>
@@ -100,8 +110,8 @@
         %>
     </ul>
 
-    <!-- BACK BUTTON -->
-    <a href="dashboard.jsp" class="btn"> Back to Dashboard</a>
+    <!-- BACK BUTTON (CORRECT FIX ✅) -->
+    <a href="<%= request.getContextPath() %>/dashboard" class="btn">⬅ Back to Dashboard</a>
 
 </div>
 

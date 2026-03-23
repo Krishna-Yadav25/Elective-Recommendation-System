@@ -10,6 +10,23 @@
 <head>
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
+
+    <script>
+        function toggleFields() {
+            let role = document.getElementById("role").value;
+
+            if (role === "student") {
+                document.getElementById("studentBox").style.display = "block";
+                document.getElementById("adminBox").style.display = "none";
+            } else if (role === "admin") {
+                document.getElementById("studentBox").style.display = "none";
+                document.getElementById("adminBox").style.display = "block";
+            } else {
+                document.getElementById("studentBox").style.display = "none";
+                document.getElementById("adminBox").style.display = "none";
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -19,7 +36,7 @@
 
     <h2>Welcome Back</h2>
 
-    <!-- ✅ ERROR MESSAGE (CORRECT POSITION) -->
+    <!-- ERROR MESSAGE -->
     <%
         String error = (String) request.getAttribute("error");
         if(error != null){
@@ -31,17 +48,36 @@
 
     <!-- LOGIN FORM -->
     <form action="login" method="post">
+
+        <!-- ROLE SELECT -->
         <div class="input-box">
-            <input type="text" name="studentId" required>
+            <select name="role" id="role" onchange="toggleFields()" required>
+                <option value="">Login As</option>
+                <option value="student">Student</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <!-- STUDENT ID -->
+        <div class="input-box" id="studentBox" style="display:none;">
+            <input type="text" name="studentId">
             <label>Student ID</label>
         </div>
 
+        <!-- ADMIN USERNAME -->
+        <div class="input-box" id="adminBox" style="display:none;">
+            <input type="text" name="username">
+            <label>Username</label>
+        </div>
+
+        <!-- PASSWORD -->
         <div class="input-box">
             <input type="password" name="password" required>
             <label>Password</label>
         </div>
 
         <button type="submit">Login</button>
+
     </form>
 
     <!-- REGISTER LINK -->

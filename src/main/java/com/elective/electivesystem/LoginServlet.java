@@ -64,6 +64,142 @@
 //        }
 //    }
 //}
+//
+//package com.elective.electivesystem;
+//
+//import java.io.*;
+//import javax.servlet.*;
+//import javax.servlet.http.*;
+//import javax.servlet.annotation.WebServlet;
+//
+//import com.mongodb.client.*;
+//import org.bson.Document;
+//import static com.mongodb.client.model.Filters.eq;
+//
+////when user hit /login this servlet will run 
+//@WebServlet("/login") 
+////servlet class handles http request(get/post)
+//public class LoginServlet extends HttpServlet {
+//
+//    private String hashPassword(String password) throws Exception {
+//        java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+//        byte[] hash = md.digest(password.getBytes());
+//        
+//        //convert every byte into hexadecimal string
+//        StringBuilder hex = new StringBuilder();
+//        for (byte b : hash) {
+//            hex.append(String.format("%02x", b));
+//        }
+//        return hex.toString();
+//    }
+//    
+//    // when login form gets submit this method is called..
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        String studentId = request.getParameter("studentId");
+//        String password = request.getParameter("password");
+//
+//        try {
+//            String hashedPassword = hashPassword(password);
+//
+//            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+//            MongoDatabase db = client.getDatabase("electiveDB");
+//            MongoCollection<Document> col = db.getCollection("users");
+//            
+//            //where student id =input student id
+//            Document user = col.find(eq("studentId", studentId)).first();
+//
+//            if (user != null && user.getString("password").equals(hashedPassword)) {
+//                //new session create
+//                HttpSession session = request.getSession();
+//
+//                session.setAttribute("studentId", studentId);
+//                session.setAttribute("name", user.getString("name"));
+//
+//               response.sendRedirect(request.getContextPath() + "/dashboard");
+//
+//            } else {
+//              
+//                request.setAttribute("error", "Invalid Student ID or Password!");
+//                request.getRequestDispatcher("index.jsp").forward(request, response);
+//            }
+//
+//            client.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//}
+
+//package com.elective.electivesystem;
+//
+//import java.io.*;
+//import javax.servlet.*;
+//import javax.servlet.http.*;
+//import javax.servlet.annotation.WebServlet;
+//
+//import com.mongodb.client.*;
+//import org.bson.Document;
+//import static com.mongodb.client.model.Filters.eq;
+//
+////when user hit /login this servlet will run 
+//@WebServlet("/login") 
+////servlet class handles http request(get/post)
+//public class LoginServlet extends HttpServlet {
+//
+//    private String hashPassword(String password) throws Exception {
+//        java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+//        byte[] hash = md.digest(password.getBytes());
+//        
+//        //convert every byte into hexadecimal string
+//        StringBuilder hex = new StringBuilder();
+//        for (byte b : hash) {
+//            hex.append(String.format("%02x", b));
+//        }
+//        return hex.toString();
+//    }
+//    
+//    // when login form gets submit this method is called..
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        String studentId = request.getParameter("studentId");
+//        String password = request.getParameter("password");
+//
+//        try {
+//            String hashedPassword = hashPassword(password);
+//
+//            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+//            MongoDatabase db = client.getDatabase("electiveDB");
+//            MongoCollection<Document> col = db.getCollection("users");
+//            
+//            //where student id =input student id
+//            Document user = col.find(eq("studentId", studentId)).first();
+//
+//            if (user != null && user.getString("password").equals(hashedPassword)) {
+//                //new session create
+//                HttpSession session = request.getSession();
+//
+//                session.setAttribute("studentId", studentId);
+//                session.setAttribute("name", user.getString("name"));
+//
+//               response.sendRedirect(request.getContextPath() + "/dashboard");
+//
+//            } else {
+//              
+//                request.setAttribute("error", "Invalid Student ID or Password!");
+//                request.getRequestDispatcher("index.jsp").forward(request, response);
+//            }
+//
+//            client.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//}
 
 package com.elective.electivesystem;
 
@@ -93,8 +229,11 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String studentId = request.getParameter("studentId");
+        String role = request.getParameter("role");
         String password = request.getParameter("password");
+
+        String studentId = request.getParameter("studentId");
+        String username = request.getParameter("username");
 
         try {
             String hashedPassword = hashPassword(password);
@@ -103,20 +242,30 @@ public class LoginServlet extends HttpServlet {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("users");
 
-            Document user = col.find(eq("studentId", studentId)).first();
+            Document user = null;
+
+            // 🔥 ROLE BASED LOGIN
+            if ("student".equals(role)) {
+                user = col.find(eq("studentId", studentId)).first();
+            } else if ("admin".equals(role)) {
+                user = col.find(eq("name", username)).first();
+            }
 
             if (user != null && user.getString("password").equals(hashedPassword)) {
 
                 HttpSession session = request.getSession();
-
-                session.setAttribute("studentId", studentId);
                 session.setAttribute("name", user.getString("name"));
+                session.setAttribute("role", role);
 
-                response.sendRedirect("dashboard.jsp");
+                if ("student".equals(role)) {
+                    session.setAttribute("studentId", user.getString("studentId"));
+                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                } else {
+                    response.sendRedirect("admin.jsp");
+                }
 
             } else {
-              
-                request.setAttribute("error", "Invalid Student ID or Password!");
+                request.setAttribute("error", "Invalid Credentials");
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
 
