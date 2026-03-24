@@ -21,15 +21,14 @@
 </head>
 
 <body>
+
 <div class="topbar">
-    
-    <!-- LEFT SIDE -->
+
     <div>
-        <h2 style="margin:0;">Elective Recommendation System</h2>
-        <small style="opacity:0.9;">Admin Panel</small>
+        <h2 style="margin:0; font-size:28px;">Elective Recommendation System</h2>
+        <small style="font-size:16px;">Admin Panel</small>
     </div>
 
-    <!-- RIGHT SIDE -->
     <div class="right-section">
         <span>Welcome, <%= session.getAttribute("name") %></span>
 
@@ -53,16 +52,15 @@
 
     <div class="dashboard">
 
-        <!-- MENU -->
         <div class="menu">
             <button onclick="showSection('add')">Add</button>
             <button onclick="showSection('delete')">Delete</button>
             <button onclick="showSection('list')">Electives</button>
             <button onclick="showSection('users')">Users</button>
+            <button onclick="showSection('queries')">Queries</button>
             <button onclick="showSection('analytics')">Analytics</button>
         </div>
 
-        <!-- CONTENT -->
         <div class="content">
 
             <!-- ADD -->
@@ -100,16 +98,15 @@
                 </form>
             </div>
 
-            <!-- 🔥 ELECTIVES LIST (ADDED HERE) -->
+            <!-- ELECTIVES -->
             <div id="list" class="section">
                 <h3>All Electives</h3>
 
                 <%
-                    List<org.bson.Document> electives =
-                        (List<org.bson.Document>) request.getAttribute("electives");
+                    List<Document> electives = (List<Document>) request.getAttribute("electives");
 
-                    if (electives != null && !electives.isEmpty()) {
-                        for (org.bson.Document e : electives) {
+                    if (electives != null) {
+                        for (Document e : electives) {
                 %>
                     <p>
                         <b><%= e.getString("name") %></b> |
@@ -118,17 +115,13 @@
                     </p>
                 <%
                         }
-                    } else {
-                %>
-                    <p>No electives found</p>
-                <%
                     }
                 %>
             </div>
 
-            <!-- USERS -->
+            <!-- USERS (UPDATED 🔥) -->
             <div id="users" class="section">
-                <h3>Users List</h3>
+                <h3>Users</h3>
 
                 <form action="admin" method="get">
                     <input type="hidden" name="action" value="users">
@@ -138,62 +131,165 @@
                 <%
                     List<Document> users = (List<Document>) request.getAttribute("users");
 
-                    if(users != null){
-                        for(Document u : users){
+                    if(users != null && !users.isEmpty()){
                 %>
-                    <p>
-                        <b><%= u.getString("name") %></b> -
-                        <%= u.getString("studentId") %>
+
+                <table style="width:100%; margin-top:15px; border-collapse: collapse;">
+                    <tr style="background:#0072ff; color:white;">
+                        <th style="padding:10px;">Name</th>
+                        <th style="padding:10px;">Student ID</th>
+                        <th style="padding:10px;">Role</th>
+                    </tr>
+
+                    <%
+                        for(Document u : users){
+                    %>
+                    <tr style="text-align:center; border-bottom:1px solid #ddd;">
+                        <td style="padding:10px;"><%= u.getString("name") %></td>
+                        <td style="padding:10px;">
+                            <%= u.getString("studentId") != null ? u.getString("studentId") : "-" %>
+                        </td>
+                        <td style="padding:10px;">
+                            <%= u.getString("role") != null ? u.getString("role") : "student" %>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    %>
+
+                </table>
+
+                <%
+                    }
+                %>
+            </div>
+
+            <!-- QUERIES -->
+            <div id="queries" class="section">
+                <h3>Student Queries</h3>
+
+                <%
+                    try {
+                        com.mongodb.client.MongoClient client =
+                                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+
+                        com.mongodb.client.MongoDatabase db =
+                                client.getDatabase("electiveDB");
+
+                        com.mongodb.client.MongoCollection<Document> col =
+                                db.getCollection("queries");
+
+                        List<Document> list =
+                                col.find().into(new ArrayList<>());
+
+                        for(Document q : list){
+                %>
+
+                <div style="border:1px solid #ccc; padding:12px; margin-bottom:12px; border-radius:10px;">
+                    <p><b>Student:</b> <%= q.getString("studentId") %></p>
+                    <p><b>Query:</b> <%= q.getString("query") %></p>
+
+                    <p><b>Answer:</b>
+                        <%= q.getString("answer") != null ? q.getString("answer") : "Not answered yet" %>
                     </p>
+
+                    <% if (q.getString("answer") == null) { %>
+
+                    <form action="answer" method="post">
+                        <input type="hidden" name="id" value="<%= q.getObjectId("_id") %>">
+                        <input type="text" name="answer" placeholder="Write answer..." required>
+                        <button type="submit">Submit Answer</button>
+                    </form>
+
+                    <% } else { %>
+
+                        <p><b>Status:</b> <%= q.getString("satisfaction") != null ? q.getString("satisfaction") : "Waiting..." %></p>
+
+                    <% } %>
+                </div>
+
                 <%
                         }
+                        client.close();
+                    } catch(Exception e){
+                        out.println("Error loading queries");
                     }
                 %>
             </div>
 
             <!-- ANALYTICS -->
             <div id="analytics" class="section">
-                <h3>Analytics</h3>
-                <canvas id="chart" width="300" height="150"></canvas>
-            </div>
+    <h3>Analytics</h3>
 
+    <div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
+
+        <div style="width:250px; height:250px;">
+            <canvas id="cgpaChart"></canvas>
+        </div>
+
+        <div style="width:250px; height:250px;">
+            <canvas id="codingChart"></canvas>
+        </div>
+
+        <div style="width:300px; height:300px;">
+            <canvas id="radarChart"></canvas>
         </div>
 
     </div>
-
+</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-function showSection(id) {
-    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
+window.onload = function () {
 
-const ctx = document.getElementById('chart').getContext('2d');
+    let cgpa = 8;
+    let codingScore = 7;
 
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['AI', 'Web', 'Cyber', 'Data Science'],
-        datasets: [{
-            label: 'Electives',
-            data: [4, 3, 2, 1]
-        }]
-    }
-});
+    // BAR
+    new Chart(document.getElementById("cgpaChart"), {
+        type: 'bar',
+        data: {
+            labels: ["CGPA"],
+            datasets: [{
+                label: "CGPA",
+                data: [cgpa]
+            }]
+        }
+    });
+
+    // DOUGHNUT
+    new Chart(document.getElementById("codingChart"), {
+        type: 'doughnut',
+        data: {
+            labels: ["Skill", "Remaining"],
+            datasets: [{
+                data: [codingScore, 10 - codingScore]
+            }]
+        }
+    });
+
+    // RADAR
+    new Chart(document.getElementById("radarChart"), {
+        type: 'radar',
+        data: {
+            labels: ["Academics", "Coding", "Goal", "Consistency", "Growth"],
+            datasets: [{
+                label: "Profile",
+                data: [
+                    cgpa,
+                    codingScore,
+                    9,
+                    7,
+                    8
+                ]
+            }]
+        }
+    });
+
+};
 </script>
-<script>
-function toggleMenu() {
-    let dropdown = document.getElementById("dropdown");
 
-    if (dropdown.style.display === "block") {
-        dropdown.style.display = "none";
-    } else {
-        dropdown.style.display = "block";
-    }
-}
-</script>
 </body>
 </html>
