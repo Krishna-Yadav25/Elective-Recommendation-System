@@ -10,108 +10,106 @@
 <html>
 <head>
     <title>Recommended Electives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI';
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        .container {
-            width: 500px;
-            margin: 80px auto;
-            padding: 30px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(12px);
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            background: rgba(255,255,255,0.2);
-            margin: 10px 0;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        li:hover {
-            transform: scale(1.05);
-            background: rgba(255,255,255,0.3);
-        }
-
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #00f2fe;
-            color: black;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: #4facfe;
-            transform: scale(1.05);
-        }
-
-        .empty {
-            color: #ffcccc;
-        }
-
-        .count {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #ddd;
-        }
+        * { transition: all 0.25s ease; }
     </style>
 </head>
 
-<body>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700 font-sans">
 
-<div class="container">
+<div class="w-[420px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl p-8 text-white">
 
-    <h2>🎯 Recommended Electives</h2>
+    <h2 class="text-2xl font-bold text-center mb-6">
+        🎯 Recommended Electives
+    </h2>
 
-    <ul>
-        <%
-            List<String> recs = (List<String>) request.getAttribute("recommendations");
+    <div class="space-y-3">
 
-            if (recs != null && !recs.isEmpty()) {
-                for (String r : recs) {
-        %>
-            <li>📘 <%= r %></li>
-        <%
-                }
-        %>
-            <div class="count">
-                Total Recommendations: <%= recs.size() %>
+    <%
+        List<String> recs = (List<String>) request.getAttribute("recommendations");
+
+        if (recs != null && !recs.isEmpty()) {
+
+            int index = 1;
+
+            for (String r : recs) {
+
+                // 👉 auto-detect domain from name
+                String domain = "General";
+
+                if(r.toLowerCase().contains("machine") || r.toLowerCase().contains("ai"))
+                    domain = "AI";
+                else if(r.toLowerCase().contains("web") || r.toLowerCase().contains("devops"))
+                    domain = "Web Development";
+                else if(r.toLowerCase().contains("cyber"))
+                    domain = "Cyber Security";
+                else if(r.toLowerCase().contains("data"))
+                    domain = "Data Science";
+    %>
+
+        <!-- ITEM -->
+        <div class="bg-white/10 p-4 rounded-xl shadow-md hover:bg-white/20">
+
+            <div class="flex items-center justify-between">
+
+                <!-- LEFT -->
+                <div class="flex items-center gap-3">
+                    <span class="w-6 h-6 flex items-center justify-center bg-indigo-400 text-xs font-bold rounded-full">
+                        <%= index++ %>
+                    </span>
+
+                    <div>
+                        <p class="text-sm font-medium"><%= r %></p>
+                        <p class="text-xs text-indigo-200"><%= domain %></p>
+                    </div>
+                </div>
+
+                <!-- RIGHT BUTTON -->
+                <form action="selectElective" method="post">
+                    <input type="hidden" name="name" value="<%= r %>">
+                    <input type="hidden" name="domain" value="<%= domain %>">
+
+                    <button class="bg-white text-indigo-600 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-indigo-100">
+                        Select
+                    </button>
+                </form>
+
             </div>
-        <%
-            } else {
-        %>
-            <li class="empty">No recommendations available</li>
-        <%
-            }
-        %>
-    </ul>
 
-    <!-- BACK BUTTON (CORRECT FIX ✅) -->
-    <a href="<%= request.getContextPath() %>/dashboard" class="btn">⬅ Back to Dashboard</a>
+        </div>
+
+    <%
+            }
+    %>
+
+    <!-- COUNT -->
+    <p class="text-center text-sm text-indigo-200 mt-4">
+        Total Recommendations: 
+        <span class="font-semibold"><%= recs.size() %></span>
+    </p>
+
+    <%
+        } else {
+    %>
+
+    <!-- EMPTY -->
+    <div class="text-center bg-red-400/20 p-4 rounded-xl text-red-200">
+        ❌ No recommendations available
+    </div>
+
+    <%
+        }
+    %>
+
+    </div>
+
+    <!-- BACK -->
+    <a href="<%= request.getContextPath() %>/dashboard"
+       class="mt-6 block text-center bg-white text-indigo-600 font-semibold py-3 rounded-xl shadow-lg hover:bg-indigo-100 hover:scale-105">
+        ← Back to Dashboard
+    </a>
 
 </div>
 

@@ -236,7 +236,7 @@ public class AdminServlet extends HttpServlet {
                             .into(new ArrayList<>())
             );
 
-            // 🔥 QUERIES (NEW ADD)
+            //  QUERIES (NEW ADD)
             MongoCollection<Document> queryCol = db.getCollection("queries");
 
             request.setAttribute("queries",

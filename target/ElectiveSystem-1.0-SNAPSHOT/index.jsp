@@ -1,93 +1,121 @@
-<%-- 
-    Document   : index.jsp
-    Created on : 21 Mar 2026, 12:39:20 pm
-    Author     : krish
---%>
 <%@ page contentType="text/html;charset=UTF-8" %>
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Login - Elective System</title>
 
-    <script>
-        function toggleFields() {
-            let role = document.getElementById("role").value;
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-            if (role === "student") {
-                document.getElementById("studentBox").style.display = "block";
-                document.getElementById("adminBox").style.display = "none";
-            } else if (role === "admin") {
-                document.getElementById("studentBox").style.display = "none";
-                document.getElementById("adminBox").style.display = "block";
-            } else {
-                document.getElementById("studentBox").style.display = "none";
-                document.getElementById("adminBox").style.display = "none";
-            }
-        }
-    </script>
+<script>
+function toggleFields() {
+    let role = document.getElementById("role").value;
+
+    document.getElementById("studentBox").style.display = "none";
+    document.getElementById("adminBox").style.display = "none";
+
+    if (role === "student") {
+        document.getElementById("studentBox").style.display = "block";
+    } else if (role === "admin") {
+        document.getElementById("adminBox").style.display = "block";
+    }
+}
+</script>
+
 </head>
-<body>
 
-<h1 class="title">Elective Recommendation System</h1>
+<body class="h-screen flex font-sans">
 
-<div class="container animate">
+<!-- LEFT SIDE -->
+<div class="w-1/2 bg-gradient-to-br from-purple-600 to-indigo-500 text-white flex flex-col justify-center items-center p-10">
 
-    <h2>Welcome Back</h2>
+    <h1 class="text-5xl font-bold mb-4">Elective Navigator 🎓</h1>
 
-    <!-- ERROR MESSAGE -->
-    <%
-        String error = (String) request.getAttribute("error");
-        if(error != null){
-    %>
-        <p class="error-msg"><%= error %></p>
-    <%
-        }
-    %>
+    <div class="bg-white/20 backdrop-blur-md p-6 rounded-2xl shadow-lg mb-6 text-center">
+        <h2 class="text-3xl font-semibold mb-2">Welcome Back 👋</h2>
+        <p class="text-sm opacity-90">
+            Choose your electives smartly and plan your future 🚀
+        </p>
+    </div>
 
-    <!-- LOGIN FORM -->
-    <form action="login" method="post">
-
-        <!-- ROLE SELECT -->
-        <div class="input-box">
-            <select name="role" id="role" onchange="toggleFields()" required>
-                <option value="">Login As</option>
-                <option value="student">Student</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
-
-        <!-- STUDENT ID -->
-        <div class="input-box" id="studentBox" style="display:none;">
-            <input type="text" name="studentId">
-            <label>Student ID</label>
-        </div>
-
-        <!-- ADMIN USERNAME -->
-        <div class="input-box" id="adminBox" style="display:none;">
-            <input type="text" name="username">
-            <label>Username</label>
-        </div>
-
-        <!-- PASSWORD -->
-        <div class="input-box">
-            <input type="password" name="password" required>
-            <label>Password</label>
-        </div>
-
-        <button type="submit">Login</button>
-
-    </form>
-
-    <!-- REGISTER LINK -->
-    <p>New user? 
-        <a href="<%= request.getContextPath() %>/register.html">Register</a>
-    </p>
+    <div class="mt-6 text-lg animate-pulse">
+        💡 Tip: Pick subjects based on interest, not trend
+    </div>
 
 </div>
 
-<script src="script.js"></script>
+<!-- RIGHT SIDE -->
+<div class="w-1/2 flex justify-center items-center bg-gray-50">
+
+    <div class="bg-white shadow-2xl rounded-2xl p-8 w-96 transition hover:scale-105 duration-300">
+
+        <h2 class="text-2xl font-semibold mb-6 text-center">Login ✨</h2>
+
+        <!-- ERROR MESSAGE -->
+        <%
+            String error = (String) request.getAttribute("error");
+            if(error != null){
+        %>
+            <p class="text-red-500 text-center mb-3"><%= error %></p>
+        <%
+            }
+        %>
+
+        <form action="login" method="post" class="space-y-4">
+
+            <!-- ROLE -->
+            <div>
+                <label class="text-sm text-gray-600">Login As</label>
+                <select name="role" id="role" onchange="toggleFields()" required
+                    class="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-indigo-400">
+                    <option value="">Select Role</option>
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <!-- STUDENT ID -->
+            <div id="studentBox" style="display:none;">
+                <label class="text-sm text-gray-600">Student ID</label>
+                <input type="text" name="studentId"
+                    class="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-indigo-400">
+            </div>
+
+            <!-- ADMIN USERNAME -->
+            <div id="adminBox" style="display:none;">
+                <label class="text-sm text-gray-600">Username</label>
+                <input type="text" name="username"
+                    class="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-indigo-400">
+            </div>
+
+            <!-- PASSWORD -->
+            <div>
+                <label class="text-sm text-gray-600">Password</label>
+                <input type="password" name="password" required
+                    class="w-full p-3 mt-1 border rounded-lg focus:ring-2 focus:ring-indigo-400">
+            </div>
+
+            <!-- BUTTON -->
+            <button type="submit"
+                class="w-full bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-lg font-semibold transition duration-300">
+                Login
+            </button>
+
+        </form>
+
+        <!-- REGISTER -->
+        <p class="text-center mt-4 text-sm">
+            New user?
+            <a href="<%= request.getContextPath() %>/register.jsp"
+               class="text-indigo-600 font-semibold hover:underline">
+               Register
+            </a>
+        </p>
+
+    </div>
+
+</div>
 
 </body>
 </html>

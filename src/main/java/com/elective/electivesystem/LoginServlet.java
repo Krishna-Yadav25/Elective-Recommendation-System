@@ -244,7 +244,7 @@ public class LoginServlet extends HttpServlet {
 
             Document user = null;
 
-            // 🔥 ROLE BASED LOGIN
+            // ROLE BASED LOGIN
             if ("student".equals(role)) {
                 user = col.find(eq("studentId", studentId)).first();
             } else if ("admin".equals(role)) {

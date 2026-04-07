@@ -16,8 +16,7 @@ public class TestHash {
 
     public static void main(String[] args) throws Exception {
 
-        String password = "admin123"; // 👈 yaha apna password likh
-
+        String password = "admin123"; //  yaha apna password likh0
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(password.getBytes());
 

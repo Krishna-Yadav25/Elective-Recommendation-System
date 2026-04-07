@@ -1,9 +1,4 @@
-<%-- 
-    Document   : admin
-    Created on : 23 Mar 2026, 3:42:21 pm
-    Author     : krish
---%>
-<%@ page contentType="text/html;charset=UTF-8" %>
+    <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*, org.bson.Document" %>
 
 <%
@@ -16,280 +11,256 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
+<title>Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body>
+<body class="bg-gray-100 font-sans">
 
-<div class="topbar">
+<!--  NAVBAR -->
+<div class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 flex justify-between items-center shadow">
 
     <div>
-        <h2 style="margin:0; font-size:28px;">Elective Recommendation System</h2>
-        <small style="font-size:16px;">Admin Panel</small>
+        <h2 class="text-2xl font-bold">Elective Recommendation System</h2>
+        <p class="text-sm opacity-80">Admin Panel</p>
     </div>
 
-    <div class="right-section">
+    <div class="flex items-center gap-4">
         <span>Welcome, <%= session.getAttribute("name") %></span>
 
-        <div class="menu-container">
-            <button onclick="toggleMenu()">⋮</button>
+        <a href="<%= request.getContextPath() %>/logout"
+           class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600">
+            Logout
+        </a>
+    </div>
+</div>
 
-            <div id="dropdown" class="dropdown">
-                <a href="<%= request.getContextPath() %>/logout">Logout</a>
-            </div>
-        </div>
+<div class="flex p-6 gap-6">
+
+<!--  SIDEBAR -->
+<div class="w-1/4 bg-white shadow rounded-xl p-5">
+
+    <h3 class="text-lg font-semibold mb-2">Admin</h3>
+    <p class="text-gray-500 mb-4"><%= session.getAttribute("name") %></p>
+
+    <div class="flex flex-col gap-3">
+        <button onclick="showSection('add')" class="bg-blue-600 text-white py-2 rounded-lg">Add</button>
+        <button onclick="showSection('delete')" class="bg-gray-200 py-2 rounded-lg">Delete</button>
+        <button onclick="showSection('list')" class="bg-gray-200 py-2 rounded-lg">Electives</button>
+        <button onclick="showSection('users')" class="bg-gray-200 py-2 rounded-lg">Users</button>
+        <button onclick="showSection('queries')" class="bg-gray-200 py-2 rounded-lg">Queries</button>
+        <button onclick="showSection('analytics')" class="bg-gray-200 py-2 rounded-lg">Analytics</button>
     </div>
 
 </div>
 
-<div class="main">
+<!-- MAIN CONTENT -->
+<div class="w-3/4 space-y-6">
 
-    <div class="profile-card">
-        <h3>Admin</h3>
-        <p><%= session.getAttribute("name") %></p>
-    </div>
+<!-- ADD -->
+<div id="add" class="section bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Add Elective</h3>
 
-    <div class="dashboard">
+    <form action="admin" method="post" class="grid grid-cols-2 gap-4">
+        <input type="hidden" name="action" value="add">
 
-        <div class="menu">
-            <button onclick="showSection('add')">Add</button>
-            <button onclick="showSection('delete')">Delete</button>
-            <button onclick="showSection('list')">Electives</button>
-            <button onclick="showSection('users')">Users</button>
-            <button onclick="showSection('queries')">Queries</button>
-            <button onclick="showSection('analytics')">Analytics</button>
+        <input type="text" name="name" placeholder="Elective Name"
+               class="border p-3 rounded-lg col-span-2">
+
+        <select name="category" class="border p-3 rounded-lg">
+            <option>AI</option>
+            <option>Web</option>
+            <option>Cyber</option>
+            <option>Data Science</option>
+        </select>
+
+        <select name="difficulty" class="border p-3 rounded-lg">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+        </select>
+
+        <button class="bg-blue-600 text-white py-3 rounded-lg col-span-2 hover:bg-blue-700">
+            Add
+        </button>
+    </form>
+</div>
+
+<!-- DELETE -->
+<div id="delete" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Delete Elective</h3>
+
+    <form action="admin" method="post" class="flex gap-3">
+        <input type="hidden" name="action" value="delete">
+        <input type="text" name="name" placeholder="Elective Name"
+               class="border p-3 rounded-lg flex-1">
+        <button class="bg-red-500 text-white px-4 rounded-lg">Delete</button>
+    </form>
+</div>
+
+<!-- ELECTIVES -->
+<div id="list" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">All Electives</h3>
+
+    <div class="space-y-2">
+    <%
+        List<Document> electives = (List<Document>) request.getAttribute("electives");
+        if (electives != null) {
+            for (Document e : electives) {
+    %>
+        <div class="p-3 border rounded-lg bg-gray-50">
+            <b><%= e.getString("name") %></b> |
+            <%= e.getString("category") %> |
+            <%= e.getString("difficulty") %>
         </div>
+    <%
+            }
+        }
+    %>
+    </div>
+</div>
 
-        <div class="content">
+<!-- USERS -->
+<div id="users" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Users</h3>
 
-            <!-- ADD -->
-            <div id="add" class="section active">
-                <h3>Add Elective</h3>
-                <form action="admin" method="post">
-                    <input type="hidden" name="action" value="add">
+    <form action="admin" method="get">
+        <input type="hidden" name="action" value="users">
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg">Load Users</button>
+    </form>
 
-                    <input type="text" name="name" placeholder="Elective Name" required>
+    <%
+        List<Document> users = (List<Document>) request.getAttribute("users");
+        if(users != null && !users.isEmpty()){
+    %>
 
-                    <select name="category">
-                        <option>AI</option>
-                        <option>Web</option>
-                        <option>Cyber</option>
-                        <option>Data Science</option>
-                    </select>
+    <table class="w-full mt-4 border">
+        <tr class="bg-blue-600 text-white">
+            <th class="p-2">Name</th>
+            <th class="p-2">Student ID</th>
+            <th class="p-2">Role</th>
+        </tr>
 
-                    <select name="difficulty">
-                        <option>Easy</option>
-                        <option>Medium</option>
-                        <option>Hard</option>
-                    </select>
+        <%
+            for(Document u : users){
+        %>
+        <tr class="text-center border-b">
+            <td class="p-2"><%= u.getString("name") %></td>
+            <td class="p-2"><%= u.getString("studentId") %></td>
+            <td class="p-2"><%= u.getString("role")!=null ? u.getString("role") : "student" %></td>
+        </tr>
+        <%
+            }
+        %>
+    </table>
 
-                    <button>Add</button>
-                </form>
-            </div>
+    <%
+        }
+    %>
+</div>
 
-            <!-- DELETE -->
-            <div id="delete" class="section">
-                <h3>Delete Elective</h3>
-                <form action="admin" method="post">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="text" name="name" placeholder="Elective Name" required>
-                    <button>Delete</button>
-                </form>
-            </div>
+<!-- QUERIES -->
+<div id="queries" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Student Queries</h3>
 
-            <!-- ELECTIVES -->
-            <div id="list" class="section">
-                <h3>All Electives</h3>
+<%
+try {
+    com.mongodb.client.MongoClient client =
+            com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
 
-                <%
-                    List<Document> electives = (List<Document>) request.getAttribute("electives");
+    com.mongodb.client.MongoDatabase db =
+            client.getDatabase("electiveDB");
 
-                    if (electives != null) {
-                        for (Document e : electives) {
-                %>
-                    <p>
-                        <b><%= e.getString("name") %></b> |
-                        <%= e.getString("category") %> |
-                        <%= e.getString("difficulty") %>
-                    </p>
-                <%
-                        }
-                    }
-                %>
-            </div>
+    com.mongodb.client.MongoCollection<Document> col =
+            db.getCollection("queries");
 
-            <!-- USERS (UPDATED 🔥) -->
-            <div id="users" class="section">
-                <h3>Users</h3>
+    List<Document> list = col.find().into(new ArrayList<>());
 
-                <form action="admin" method="get">
-                    <input type="hidden" name="action" value="users">
-                    <button>Load Users</button>
-                </form>
+    for(Document q : list){
+%>
 
-                <%
-                    List<Document> users = (List<Document>) request.getAttribute("users");
+<div class="border p-4 mb-3 rounded-lg">
+    <p><b>Student:</b> <%= q.getString("studentId") %></p>
+    <p><b>Query:</b> <%= q.getString("query") %></p>
 
-                    if(users != null && !users.isEmpty()){
-                %>
+    <p><b>Answer:</b>
+        <%= q.getString("answer") != null ? q.getString("answer") : "Not answered yet" %>
+    </p>
 
-                <table style="width:100%; margin-top:15px; border-collapse: collapse;">
-                    <tr style="background:#0072ff; color:white;">
-                        <th style="padding:10px;">Name</th>
-                        <th style="padding:10px;">Student ID</th>
-                        <th style="padding:10px;">Role</th>
-                    </tr>
+    <% if (q.getString("answer") == null) { %>
 
-                    <%
-                        for(Document u : users){
-                    %>
-                    <tr style="text-align:center; border-bottom:1px solid #ddd;">
-                        <td style="padding:10px;"><%= u.getString("name") %></td>
-                        <td style="padding:10px;">
-                            <%= u.getString("studentId") != null ? u.getString("studentId") : "-" %>
-                        </td>
-                        <td style="padding:10px;">
-                            <%= u.getString("role") != null ? u.getString("role") : "student" %>
-                        </td>
-                    </tr>
-                    <%
-                        }
-                    %>
+    <form action="answer" method="post" class="flex gap-2 mt-2">
+        <input type="hidden" name="id" value="<%= q.getObjectId("_id") %>">
+        <input type="text" name="answer" placeholder="Write answer..." class="border p-2 flex-1">
+        <button class="bg-green-500 text-white px-4 rounded">Submit</button>
+    </form>
 
-                </table>
+    <% } %>
+</div>
 
-                <%
-                    }
-                %>
-            </div>
+<%
+    }
+    client.close();
+} catch(Exception e){
+    out.println("Error loading queries");
+}
+%>
+</div>
 
-            <!-- QUERIES -->
-            <div id="queries" class="section">
-                <h3>Student Queries</h3>
+<!-- ANALYTICS -->
+<div id="analytics" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Analytics</h3>
 
-                <%
-                    try {
-                        com.mongodb.client.MongoClient client =
-                                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                        com.mongodb.client.MongoDatabase db =
-                                client.getDatabase("electiveDB");
-
-                        com.mongodb.client.MongoCollection<Document> col =
-                                db.getCollection("queries");
-
-                        List<Document> list =
-                                col.find().into(new ArrayList<>());
-
-                        for(Document q : list){
-                %>
-
-                <div style="border:1px solid #ccc; padding:12px; margin-bottom:12px; border-radius:10px;">
-                    <p><b>Student:</b> <%= q.getString("studentId") %></p>
-                    <p><b>Query:</b> <%= q.getString("query") %></p>
-
-                    <p><b>Answer:</b>
-                        <%= q.getString("answer") != null ? q.getString("answer") : "Not answered yet" %>
-                    </p>
-
-                    <% if (q.getString("answer") == null) { %>
-
-                    <form action="answer" method="post">
-                        <input type="hidden" name="id" value="<%= q.getObjectId("_id") %>">
-                        <input type="text" name="answer" placeholder="Write answer..." required>
-                        <button type="submit">Submit Answer</button>
-                    </form>
-
-                    <% } else { %>
-
-                        <p><b>Status:</b> <%= q.getString("satisfaction") != null ? q.getString("satisfaction") : "Waiting..." %></p>
-
-                    <% } %>
-                </div>
-
-                <%
-                        }
-                        client.close();
-                    } catch(Exception e){
-                        out.println("Error loading queries");
-                    }
-                %>
-            </div>
-
-            <!-- ANALYTICS -->
-            <div id="analytics" class="section">
-    <h3>Analytics</h3>
-
-    <div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
-
-        <div style="width:250px; height:250px;">
+        <!-- Chart 1 -->
+        <div class="bg-gray-50 p-4 rounded-xl h-64">
             <canvas id="cgpaChart"></canvas>
         </div>
 
-        <div style="width:250px; height:250px;">
+        <!-- Chart 2 -->
+        <div class="bg-gray-50 p-4 rounded-xl h-64">
             <canvas id="codingChart"></canvas>
         </div>
 
-        <div style="width:300px; height:300px;">
+        <!-- Chart 3 -->
+        <div class="bg-gray-50 p-4 rounded-xl h-64">
             <canvas id="radarChart"></canvas>
         </div>
 
     </div>
 </div>
+
+</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-window.onload = function () {
+function showSection(id){
+document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
+document.getElementById(id).classList.remove("hidden");
+}
 
-    let cgpa = 8;
-    let codingScore = 7;
+window.onload = function(){
 
-    // BAR
-    new Chart(document.getElementById("cgpaChart"), {
-        type: 'bar',
-        data: {
-            labels: ["CGPA"],
-            datasets: [{
-                label: "CGPA",
-                data: [cgpa]
-            }]
-        }
-    });
+new Chart(document.getElementById("cgpaChart"),{
+type:'bar',
+data:{labels:["CGPA"],datasets:[{data:[8]}]}
+});
 
-    // DOUGHNUT
-    new Chart(document.getElementById("codingChart"), {
-        type: 'doughnut',
-        data: {
-            labels: ["Skill", "Remaining"],
-            datasets: [{
-                data: [codingScore, 10 - codingScore]
-            }]
-        }
-    });
+new Chart(document.getElementById("codingChart"),{
+type:'doughnut',
+data:{labels:["Skill","Remaining"],datasets:[{data:[7,3]}]}
+});
 
-    // RADAR
-    new Chart(document.getElementById("radarChart"), {
-        type: 'radar',
-        data: {
-            labels: ["Academics", "Coding", "Goal", "Consistency", "Growth"],
-            datasets: [{
-                label: "Profile",
-                data: [
-                    cgpa,
-                    codingScore,
-                    9,
-                    7,
-                    8
-                ]
-            }]
-        }
-    });
+new Chart(document.getElementById("radarChart"),{
+type:'radar',
+data:{labels:["Academics","Coding","Goal","Consistency","Growth"],
+datasets:[{data:[8,7,9,7,8]}]}
+});
 
-};
+}
 </script>
 
 </body>
-</html>
+</html> 

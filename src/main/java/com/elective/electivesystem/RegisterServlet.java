@@ -101,7 +101,8 @@ public class RegisterServlet extends HttpServlet {
 
             Document doc = new Document("name", name)
                     .append("studentId", studentId)
-                    .append("password", hashedPassword);
+                    .append("password", hashedPassword)
+                     .append("role", "student");
 
             col.insertOne(doc);
 

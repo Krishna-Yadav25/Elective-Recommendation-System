@@ -1,10 +1,3 @@
-<%-- 
-    Document   : dashboard.jsp
-    Created on : 19 Mar 2026, 8:38:57 pm
-    Author     : krish
---%>
-<!--
--->
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*, org.bson.Document" %>
 
@@ -22,253 +15,321 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
+<meta charset="UTF-8">
+<title>Dashboard</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* { transition: all 0.2s ease-in-out; }
+.btn {
+    background:#6366f1;
+    color:white;
+    padding:10px;
+    border-radius:10px;
+}
+.input {
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+</style>
 </head>
 
-<body>
+<body class="bg-indigo-50 font-sans">
 
-<div class="topbar">
-    <h2>Elective Recommendation System</h2>
+<!-- NAVBAR -->
+<div class="bg-white shadow px-6 py-4 flex justify-between items-center">
 
-    <div class="right-section">
-        <span>Welcome, <%= name %> (<%= role %>)</span>
+    <h1 class="text-xl font-bold text-indigo-600">
+        Elective Recommendation System
+    </h1>
 
-        <div class="menu-container">
-            <button onclick="toggleMenu()">⋮</button>
+    <div class="flex items-center gap-4">
+        <span>Welcome, <%= name %></span>
 
-            <div id="dropdown" class="dropdown">
-                <% if ("admin".equals(role)) { %>
-                    <a href="admin.jsp">Admin Panel</a>
-                <% } %>
-                <a href="logout">Logout</a>
-            </div>
-        </div>
+        <a href="logout"
+           class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm shadow">
+            Logout
+        </a>
     </div>
+
 </div>
 
-<div class="main">
+<div class="flex p-6 gap-6">
 
-    <div class="profile-card">
-        <img src="images/default.jpeg" class="profile-pic">
-        <h3><%= name %></h3>
+<!-- PROFILE -->
+<div class="w-1/4 bg-indigo-600 text-white rounded-xl p-6 text-center">
+    <h2 class="text-xl font-bold"><%= name %></h2>
+    <p>ID: <%= studentId %></p>
+    <p>Branch: CSE</p>
+</div>
 
-        <% if ("student".equals(role)) { %>
-            <p>ID: <%= studentId %></p>
-        <% } else { %>
-            <p>Role: Admin</p>
-        <% } %>
+<!-- CONTENT -->
+<div class="w-3/4">
 
-        <p>Course: B.Tech</p>
-        <p>Branch: CSE</p>
-    </div>
+<!-- MENU -->
+<div class="flex gap-3 mb-6 flex-wrap">
+    <button onclick="showSection('academic')" class="btn">Academic</button>
+    <button onclick="showSection('recommend')" class="btn">Recommend</button>
+    <button onclick="showSection('analytics')" class="btn">Analytics</button>
+    <button onclick="showSection('query')" class="btn">Query</button>
+    <button onclick="showSection('answers')" class="btn">My Queries</button>
+    <button onclick="showSection('electives')" class="btn">Electives</button>
+    <button onclick="showSection('selected')" class="btn">My Electives</button>
+</div>
 
-    <div class="dashboard">
+<div class="bg-white p-6 rounded-xl shadow">
 
-        <div class="menu">
-            <button onclick="showSection('academic')">Academic</button>
-            <button onclick="showSection('recommend')">Recommend</button>
-            <button onclick="showSection('analytics')">Analytics</button>
-            <button onclick="showSection('query')">Query</button>
-            <button onclick="showSection('answers')">My Queries</button>
+<!-- ACADEMIC -->
+<div id="academic" class="section">
+    <h2 class="text-lg font-semibold mb-4">Academic Details</h2>
+
+    <form action="dashboard" method="post" class="grid grid-cols-2 gap-4">
+        <input type="text" name="branch" placeholder="Branch" class="input">
+        <input type="text" name="semester" placeholder="Semester" class="input">
+        <input type="number" name="tenth" placeholder="10th %" class="input">
+        <input type="number" name="twelfth" placeholder="12th %" class="input">
+
+        <input type="number" step="0.01" name="cgpa" placeholder="CGPA" class="input col-span-2">
+
+        <select name="codingLevel" class="input">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+        </select>
+
+        <select name="goal" class="input">
+            <option>Placement</option>
+            <option>Higher Studies</option>
+        </select>
+
+        <button class="btn col-span-2">Save</button>
+    </form>
+</div>
+
+<!-- RECOMMEND -->
+<div id="recommend" class="section hidden">
+    <h2 class="text-lg font-semibold mb-4">Recommendation</h2>
+
+    <form action="recommend" method="post" class="space-y-4">
+        <select name="interest" class="input w-full">
+            <option>Select Interest</option>
+            <option>AI</option>
+            <option>Web</option>
+            <option>Cyber</option>
+            <option>Data Science</option>
+        </select>
+
+        <input type="number" step="0.01" name="cgpa" class="input w-full" placeholder="Enter CGPA">
+
+        <button class="btn w-full">Get Top Electives</button>
+    </form>
+</div>
+
+<!-- ANALYTICS -->
+<div id="analytics" class="section hidden">
+    <h2 class="text-lg font-semibold mb-6">Analytics Dashboard</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="bg-gray-50 p-4 rounded-xl shadow">
+            <canvas id="barChart"></canvas>
         </div>
 
-        <div class="content">
-
-            <div id="academic" class="section active">
-                <h3>Academic Details</h3>
-
-                <form action="dashboard" method="post" enctype="multipart/form-data">
-                    <input type="text" name="branch" placeholder="Branch" required>
-                    <input type="text" name="semester" placeholder="Semester" required>
-
-                    <input type="number" name="tenth" placeholder="10th %" required>
-                    <input type="number" name="twelfth" placeholder="12th %" required>
-
-                    <input type="number" step="0.01" name="cgpa" placeholder="CGPA" required>
-
-                    <select name="codingLevel">
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                    </select>
-
-                    <select name="goal">
-                        <option value="Placement">Placement</option>
-                        <option value="Higher Studies">Higher Studies</option>
-                    </select>
-
-                    <button type="submit">Save</button>
-                </form>
-            </div>
-
-            <div id="recommend" class="section">
-                <h3>Recommendation</h3>
-
-                <form action="recommend" method="post">
-                    <select name="interest" required>
-                        <option value="">Select Interest</option>
-                        <option value="AI">AI</option>
-                        <option value="Web">Web</option>
-                        <option value="Cyber">Cyber</option>
-                        <option value="Data Science">Data Science</option>
-                    </select>
-
-                    <input type="number" step="0.01" name="cgpa" placeholder="Enter CGPA" required>
-
-                    <button type="submit">Get Top Electives</button>
-                </form>
-            </div>
-
-            <!-- 🔥 FIXED ANALYTICS SECTION -->
-            <div id="analytics" class="section">
-                <h3>Student Analytics</h3>
-
-                <%
-                    String cgpaStr = (String) request.getAttribute("cgpa");
-                    String codingLevel = (String) request.getAttribute("codingLevel");
-
-                    if(cgpaStr == null) cgpaStr = "0";
-                    if(codingLevel == null) codingLevel = "Beginner";
-                %>
-
-                <p><b>CGPA:</b> <%= cgpaStr %></p>
-                <p><b>Coding Level:</b> <%= codingLevel %></p>
-
-                <div style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center;">
-
-                    <div style="width:250px;">
-                        <canvas id="cgpaChart"></canvas>
-                    </div>
-
-                    <div style="width:250px;">
-                        <canvas id="codingChart"></canvas>
-                    </div>
-
-                    <div style="width:300px;">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-
-                </div>
-            </div>
-
-            <div id="query" class="section">
-                <h3>Ask Query</h3>
-
-                <form action="query" method="post">
-                    <textarea name="query" placeholder="Write your query..." required style="grid-column: span 2;"></textarea>
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-
-            <div id="answers" class="section">
-                <h3>Your Queries</h3>
-
-                <%
-                    try {
-                        com.mongodb.client.MongoClient client =
-                                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
-
-                        com.mongodb.client.MongoDatabase db =
-                                client.getDatabase("electiveDB");
-
-                        com.mongodb.client.MongoCollection<Document> col =
-                                db.getCollection("queries");
-
-                        List<Document> list =
-                                col.find(new Document("studentId", studentId))
-                                   .into(new ArrayList<>());
-
-                        for(Document q : list){
-                %>
-
-                    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:8px;">
-                        <p><b>Q:</b> <%= q.getString("query") %></p>
-
-                        <p><b>A:</b>
-                            <%= q.getString("answer") != null ? q.getString("answer") : "Pending..." %>
-                        </p>
-
-                        <% if ("answered".equals(q.getString("status"))) { %>
-                            <form action="satisfy" method="post">
-                                <input type="hidden" name="id" value="<%= q.getObjectId("_id") %>">
-
-                                <button name="status" value="yes">Satisfied</button>
-                                <button name="status" value="no">Not Satisfied</button>
-                            </form>
-                        <% } %>
-                    </div>
-
-                <%
-                        }
-                        client.close();
-                    } catch(Exception e){
-                        out.println("Error loading queries");
-                    }
-                %>
-            </div>
-
+        <div class="bg-gray-50 p-4 rounded-xl shadow">
+            <canvas id="pieChart"></canvas>
         </div>
+
+        <div class="bg-gray-50 p-4 rounded-xl shadow col-span-2">
+            <canvas id="lineChart"></canvas>
+        </div>
+
+    </div>
+</div>
+<!-- MY SELECTED ELECTIVES -->
+<div id="selected" class="section hidden">
+    <h2 class="text-lg font-semibold mb-4">My Selected Electives</h2>
+
+    <%
+        try {
+            com.mongodb.client.MongoClient client =
+                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+
+            com.mongodb.client.MongoDatabase db =
+                client.getDatabase("electiveDB");
+
+            com.mongodb.client.MongoCollection<org.bson.Document> col =
+                db.getCollection("selected_electives");
+
+            java.util.List<org.bson.Document> list =
+                col.find(new org.bson.Document("studentId", studentId))
+                   .into(new java.util.ArrayList<>());
+
+            if(list.isEmpty()){
+    %>
+
+    <p class="text-gray-500">No electives selected yet.</p>
+
+    <%
+            } else {
+                for(org.bson.Document e : list){
+    %>
+
+    <div class="border p-3 mb-2 bg-green-50 rounded">
+        <b><%= e.getString("name") %></b>
+        <p><%= e.getString("domain") %></p>
     </div>
 
+    <%
+                }
+            }
+
+            client.close();
+        } catch(Exception e){
+            out.println("Error loading electives");
+        }
+    %>
+</div>
+
+<!-- QUERY -->
+<div id="query" class="section hidden">
+    <h2 class="text-lg font-semibold mb-4">Ask Query</h2>
+
+    <form action="query" method="post">
+        <textarea name="query" class="input w-full"></textarea>
+        <button class="btn w-full mt-2">Submit</button>
+    </form>
+</div>
+
+<!-- ANSWERS -->
+<div id="answers" class="section hidden">
+    <h2 class="text-lg font-semibold mb-4">Your Queries</h2>
+
+    <%
+        try {
+            com.mongodb.client.MongoClient client =
+                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+
+            com.mongodb.client.MongoDatabase db =
+                client.getDatabase("electiveDB");
+
+            com.mongodb.client.MongoCollection<Document> col =
+                db.getCollection("queries");
+
+            List<Document> list =
+                col.find(new Document("studentId", studentId))
+                   .into(new ArrayList<>());
+
+            for(Document q : list){
+    %>
+
+    <div class="border p-4 mb-3">
+        <p><b>Q:</b> <%= q.getString("query") %></p>
+        <p><b>A:</b> <%= q.getString("answer") != null ? q.getString("answer") : "Pending..." %></p>
+    </div>
+
+    <%
+            }
+            client.close();
+        } catch(Exception e){
+            out.println("Error loading queries");
+        }
+    %>
+</div>
+
+<!-- ELECTIVES -->
+<div id="electives" class="section hidden">
+    <h2 class="text-lg font-semibold mb-4">Available Electives</h2>
+
+    <%
+        try {
+            com.mongodb.client.MongoClient client =
+                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+
+            com.mongodb.client.MongoDatabase db =
+                client.getDatabase("electiveDB");
+
+            com.mongodb.client.MongoCollection<Document> col =
+                db.getCollection("electives");
+
+            List<Document> list = col.find().into(new ArrayList<>());
+
+            for(Document e : list){
+    %>
+
+    <div class="border p-4 mb-3 bg-gray-50 rounded">
+        <h3 class="text-indigo-600 font-bold"><%= e.getString("name") %></h3>
+        <p>Domain: <%= e.getString("domain") %></p>
+        <p>Difficulty: <%= e.getString("difficulty") %></p>
+        <p><%= e.getString("description") %></p>
+    </div>
+
+    <%
+            }
+            client.close();
+        } catch(Exception e){
+            out.println("Error loading electives");
+        }
+    %>
+</div>
+
+</div>
+</div>
 </div>
 
 <script>
+let chartsLoaded = false;
 
 function showSection(id) {
-    document.querySelectorAll(".section").forEach(sec => {
-        sec.classList.remove("active");
-    });
-    document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".section").forEach(sec => sec.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+
+    if (id === "analytics" && !chartsLoaded) {
+        loadCharts();
+        chartsLoaded = true;
+    }
 }
 
-function toggleMenu() {
-    let dropdown = document.getElementById("dropdown");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-}
+function loadCharts() {
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    let cgpa = <%= request.getAttribute("cgpa") != null ? request.getAttribute("cgpa") : 0 %>;
-    let coding = "<%= request.getAttribute("codingLevel") != null ? request.getAttribute("codingLevel") : "Beginner" %>";
-
-    let codingScore = 3;
-    if (coding === "Intermediate") codingScore = 6;
-    if (coding === "Advanced") codingScore = 9;
-
-    new Chart(document.getElementById("cgpaChart"), {
+    new Chart(document.getElementById("barChart"), {
         type: 'bar',
         data: {
-            labels: ["CGPA"],
+            labels: ['10th', '12th', 'CGPA'],
             datasets: [{
-                data: [cgpa]
+                label: 'Academic Performance',
+                data: [85, 88, 8.5],
+                backgroundColor: ['#6366f1','#818cf8','#4f46e5']
             }]
         }
     });
 
-    new Chart(document.getElementById("codingChart"), {
-        type: 'doughnut',
+    new Chart(document.getElementById("pieChart"), {
+        type: 'pie',
         data: {
-            labels: ["Skill", "Remaining"],
+            labels: ['AI', 'Web', 'Cyber', 'Data Science'],
             datasets: [{
-                data: [codingScore, 10 - codingScore]
+                data: [30, 25, 20, 25],
+                backgroundColor: ['#6366f1','#818cf8','#4f46e5','#a5b4fc']
             }]
         }
     });
 
-    new Chart(document.getElementById("radarChart"), {
-        type: 'radar',
+    new Chart(document.getElementById("lineChart"), {
+        type: 'line',
         data: {
-            labels: ["Academics", "Coding", "Goal", "Consistency", "Growth"],
+            labels: ['Sem1', 'Sem2', 'Sem3', 'Sem4'],
             datasets: [{
-                data: [cgpa, codingScore, 8, 7, 9]
+                label: 'CGPA Trend',
+                data: [7.5, 8.0, 8.3, 8.5],
+                borderColor: '#6366f1',
+                fill: false
             }]
         }
     });
-
-});
+}
 </script>
 
 </body>
