@@ -11,7 +11,6 @@ import javax.servlet.annotation.*;
 
 import com.mongodb.client.*;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
@@ -22,20 +21,31 @@ public class SatisfyServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String id = request.getParameter("id");
+        // Get studentId from session
+        HttpSession session = request.getSession(false);
+        String studentId = (String) session.getAttribute("studentId");
+
         String status = request.getParameter("status");
 
         MongoClient client = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase db = client.getDatabase("electiveDB");
-        MongoCollection<Document> col = db.getCollection("queries");
 
-        col.updateOne(
-                eq("_id", new ObjectId(id)),
-                set("satisfaction", status)
-        );
+        try {
+            MongoDatabase db = client.getDatabase("electiveDB");
+            MongoCollection<Document> col = db.getCollection("queries");
 
-        client.close();
+            //  Update using studentId
+            col.updateOne(
+                    eq("studentId", studentId),
+                    set("satisfaction", status)
+            );
 
-        response.sendRedirect("dashboard.jsp");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            client.close();
+        }
+
+        //  redirect back to queries section
+        response.sendRedirect("dashboard.jsp?section=queries");
     }
 }

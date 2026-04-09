@@ -120,6 +120,193 @@
 
 
 
+//
+
+
+//package com.elective.electivesystem;
+//
+//import java.io.*;
+//import java.util.*;
+//import javax.servlet.*;
+//import javax.servlet.http.*;
+//import javax.servlet.annotation.WebServlet;
+//
+//import com.mongodb.client.*;
+//import org.bson.Document;
+//import static com.mongodb.client.model.Filters.eq;
+//
+//@WebServlet("/recommend")
+//public class RecommendServlet extends HttpServlet {
+//
+//    class Elective {
+//        String name;
+//        String category;
+//        int difficulty;
+//
+//        Elective(String name, String category, int difficulty) {
+//            this.name = name;
+//            this.category = category;
+//            this.difficulty = difficulty;
+//        }
+//    }
+//
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        try {
+//
+//            // =========================
+//            // 1. GET FORM DATA (JSP)
+//            // =========================
+//            String interest = request.getParameter("interest");
+//            double cgpa = Double.parseDouble(request.getParameter("cgpa"));
+//
+//            HttpSession session = request.getSession();
+//            String studentId = (String) session.getAttribute("studentId");
+//
+//            // =========================
+//            // 2. FETCH SWING DATA (MongoDB)
+//            // =========================
+//            String swingInterests = "";
+//            String goal = "";
+//            String frequency = "";
+//
+//            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+//            MongoDatabase db = client.getDatabase("electiveDB");
+//            MongoCollection<Document> col = db.getCollection("codingProfiles");
+//
+//            Document profile = col.find(eq("studentId", studentId)).first();
+//
+//            if (profile != null) {
+//                swingInterests = profile.getString("interests");
+//                goal = profile.getString("goal");
+//                frequency = profile.getString("frequency");
+//            }
+//
+//            // =========================
+//            // 3. ELECTIVE LIST
+//            // =========================
+//            List<Elective> electives = new ArrayList<>();
+//
+//            electives.add(new Elective("Fundamentals of Computer Vision and AI", "AI", 10));
+//            electives.add(new Elective("Machine Learning", "AI", 10));
+//            electives.add(new Elective("Linear Algebra", "AI", 7));
+//
+//            electives.add(new Elective("Statistical Data Analysis using R", "Data Science", 9));
+//            electives.add(new Elective("Big Data Analytics", "Data Science", 9));
+//
+//            electives.add(new Elective("Foundation of Cyber Security", "Cyber Security", 8));
+//            electives.add(new Elective("Ethical Hacking", "Cyber Security", 9));
+//
+//            electives.add(new Elective("Virtualization and Cloud Computing", "Web Development", 8));
+//            electives.add(new Elective("DevOps", "Web Development", 8));
+//
+//            electives.add(new Elective("Blockchain and its Applications", "Emerging Tech", 9));
+//            electives.add(new Elective("Internet of Things (IoT)", "Emerging Tech", 7));
+//
+//            // =========================
+//            // 4. FILTER LOGIC
+//            // =========================
+//            List<Elective> filtered = new ArrayList<>();
+//
+//            for (Elective e : electives) {
+//
+//                // Match JSP interest
+//                if (e.category.equalsIgnoreCase(interest)) {
+//                    filtered.add(e);
+//                }
+//
+//                // Linear Algebra rule
+//                if ((interest.equalsIgnoreCase("AI") || interest.equalsIgnoreCase("Data Science"))
+//                        && e.name.contains("Linear Algebra")) {
+//                    filtered.add(e);
+//                }
+//
+//                // CGPA rule
+//                if (cgpa >= 8.5 && e.difficulty >= 9) {
+//                    filtered.add(e);
+//                }
+//
+//                if (cgpa < 7 && e.difficulty <= 7) {
+//                    filtered.add(e);
+//                }
+//
+//                // =========================
+//                //   SWING LOGIC
+//                // =========================
+//
+//                // If goal = Placement → prefer DSA/AI
+//                if ("Placement".equalsIgnoreCase(goal)) {
+//                    if (e.category.equalsIgnoreCase("AI") || e.name.contains("Data")) {
+//                        filtered.add(e);
+//                    }
+//                }
+//
+//                // If goal = Projects → prefer Web/AI
+//                if ("Projects".equalsIgnoreCase(goal)) {
+//                    if (e.category.equalsIgnoreCase("Web Development") || e.category.equalsIgnoreCase("AI")) {
+//                        filtered.add(e);
+//                    }
+//                }
+//
+//                // If interest contains AI
+//                if (swingInterests != null && swingInterests.contains("AI")) {
+//                    if (e.category.equalsIgnoreCase("AI")) {
+//                        filtered.add(e);
+//                    }
+//                }
+//
+//                // If low activity → suggest easy subjects
+//                if ("Rarely".equalsIgnoreCase(frequency) && e.difficulty <= 7) {
+//                    filtered.add(e);
+//                }
+//            }
+//
+//            // =========================
+//            // 5. REMOVE DUPLICATES
+//            // =========================
+//            Set<String> unique = new HashSet<>();
+//            List<Elective> finalList = new ArrayList<>();
+//
+//            for (Elective e : filtered) {
+//                if (!unique.contains(e.name)) {
+//                    unique.add(e.name);
+//                    finalList.add(e);
+//                }
+//            }
+//
+//            // =========================
+//            // 6. SORT BY DIFFICULTY
+//            // =========================
+//            Collections.sort(finalList, (a, b) -> b.difficulty - a.difficulty);
+//
+//            // =========================
+//            // 7. TOP 3 RESULTS
+//            // =========================
+//            List<String> result = new ArrayList<>();
+//
+//            for (int i = 0; i < Math.min(3, finalList.size()); i++) {
+//                result.add(finalList.get(i).name);
+//            }
+//
+//            // =========================
+//            // 8. SEND TO JSP
+//            // =========================
+//            request.setAttribute("recommendations", result);
+//            request.setAttribute("goal", goal);
+//            request.setAttribute("frequency", frequency);
+//
+//            request.getRequestDispatcher("recommend.jsp").forward(request, response);
+//
+//            client.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response.getWriter().println("Error in recommendation module");
+//        }
+//    }
+//}
+
 package com.elective.electivesystem;
 
 import java.io.*;
@@ -128,10 +315,14 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
 
+import com.mongodb.client.*;
+import org.bson.Document;
+import static com.mongodb.client.model.Filters.eq;
+
 @WebServlet("/recommend")
 public class RecommendServlet extends HttpServlet {
 
-    
+    // Elective Class
     class Elective {
         String name;
         String category;
@@ -149,85 +340,127 @@ public class RecommendServlet extends HttpServlet {
 
         try {
 
-            
+            // ==========================
+            // 1. GET FORM DATA
+            // ==========================
             String interest = request.getParameter("interest");
             double cgpa = Double.parseDouble(request.getParameter("cgpa"));
 
-            
+            HttpSession session = request.getSession();
+            String studentId = (String) session.getAttribute("studentId");
+
+            // ==========================
+            // 2. FETCH SWING DATA (MongoDB)
+            // ==========================
+            String swingInterests = "";
+            String goal = "";
+            String frequency = "";
+
+            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+            MongoDatabase db = client.getDatabase("electiveDB");
+            MongoCollection<Document> col = db.getCollection("codingProfiles");
+
+            Document profile = col.find(eq("studentId", studentId)).first();
+
+            if (profile != null) {
+                swingInterests = profile.getString("interests");
+                goal = profile.getString("goal");
+                frequency = profile.getString("frequency");
+            }
+
+            // ==========================
+            // 3. ELECTIVE LIST
+            // ==========================
             List<Elective> electives = new ArrayList<>();
 
-          
             electives.add(new Elective("Fundamentals of Computer Vision and AI", "AI", 10));
             electives.add(new Elective("Machine Learning", "AI", 10));
             electives.add(new Elective("Linear Algebra", "AI", 7));
 
-            
             electives.add(new Elective("Statistical Data Analysis using R", "Data Science", 9));
             electives.add(new Elective("Big Data Analytics", "Data Science", 9));
 
-            
             electives.add(new Elective("Foundation of Cyber Security", "Cyber Security", 8));
             electives.add(new Elective("Ethical Hacking", "Cyber Security", 9));
 
-            
             electives.add(new Elective("Virtualization and Cloud Computing", "Web Development", 8));
             electives.add(new Elective("DevOps", "Web Development", 8));
 
-           
             electives.add(new Elective("Blockchain and its Applications", "Emerging Tech", 9));
             electives.add(new Elective("Internet of Things (IoT)", "Emerging Tech", 7));
 
-            
-            List<Elective> filtered = new ArrayList<>();
+            // ==========================
+            // 4. SCORE BASED LOGIC 
+            // ==========================
+            Map<Elective, Integer> scoreMap = new HashMap<>();
 
             for (Elective e : electives) {
+                int score = 0;
 
-              
+                // Interest match (highest weight)
                 if (e.category.equalsIgnoreCase(interest)) {
-                    filtered.add(e);
+                    score += 5;
                 }
 
-                
-                if ((interest.equalsIgnoreCase("AI") || interest.equalsIgnoreCase("Data Science"))
-                        && e.name.contains("Linear Algebra")) {
-                    filtered.add(e);
+                // Swing interests
+                if (swingInterests != null && swingInterests.contains(e.category)) {
+                    score += 3;
                 }
 
-                
-                if (cgpa >= 8.5 && e.difficulty >= 9) {
-                    filtered.add(e);
+                // Goal based
+                if ("Placement".equalsIgnoreCase(goal)) {
+                    if (e.category.equalsIgnoreCase("AI") || e.name.contains("Data")) {
+                        score += 4;
+                    }
                 }
 
-              
-                if (cgpa < 7 && e.difficulty <= 7) {
-                    filtered.add(e);
+                if ("Projects".equalsIgnoreCase(goal)) {
+                    if (e.category.equalsIgnoreCase("Web Development")) {
+                        score += 4;
+                    }
                 }
+
+                // CGPA vs Difficulty
+                if (cgpa >= 8.5 && e.difficulty >= 8) {
+                    score += 3;
+                } else if (cgpa < 7 && e.difficulty <= 7) {
+                    score += 3;
+                }
+
+                // Activity level
+                if ("Rarely".equalsIgnoreCase(frequency) && e.difficulty <= 7) {
+                    score += 2;
+                }
+
+                scoreMap.put(e, score);
             }
 
-           
-            Set<String> unique = new HashSet<>();
-            List<Elective> finalList = new ArrayList<>();
+            // ==========================
+            // 5. SORT BY SCORE
+            // ==========================
+            List<Elective> finalList = new ArrayList<>(scoreMap.keySet());
 
-            for (Elective e : filtered) {
-                if (!unique.contains(e.name)) {
-                    unique.add(e.name);
-                    finalList.add(e);
-                }
-            }
+            Collections.sort(finalList, (a, b) -> scoreMap.get(b) - scoreMap.get(a));
 
-            
-            Collections.sort(finalList, (a, b) -> b.difficulty - a.difficulty);
-
-            
+            // ==========================
+            // 6. TOP 3 RESULTS
+            // ==========================
             List<String> result = new ArrayList<>();
 
             for (int i = 0; i < Math.min(3, finalList.size()); i++) {
                 result.add(finalList.get(i).name);
             }
 
-         
+            // ==========================
+            // 7. SEND TO JSP
+            // ==========================
             request.setAttribute("recommendations", result);
+            request.setAttribute("goal", goal);
+            request.setAttribute("frequency", frequency);
+
             request.getRequestDispatcher("recommend.jsp").forward(request, response);
+
+            client.close();
 
         } catch (Exception e) {
             e.printStackTrace();

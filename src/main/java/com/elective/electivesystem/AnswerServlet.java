@@ -2,6 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
+
+
 package com.elective.electivesystem;
 
 import java.io.*;
@@ -11,10 +13,8 @@ import javax.servlet.annotation.*;
 
 import com.mongodb.client.*;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.*;
 
 @WebServlet("/answer")
 public class AnswerServlet extends HttpServlet {
@@ -29,8 +29,15 @@ public class AnswerServlet extends HttpServlet {
             return;
         }
 
-        String id = request.getParameter("id");
+        //  GET studentId instead of id
+        String studentId = request.getParameter("studentId");
         String answer = request.getParameter("answer");
+
+        // safety check
+        if (studentId == null || answer == null || answer.trim().isEmpty()) {
+            response.sendRedirect("admin");
+            return;
+        }
 
         MongoClient client = MongoClients.create("mongodb://localhost:27017");
 
@@ -38,18 +45,23 @@ public class AnswerServlet extends HttpServlet {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("queries");
 
+            //  CREATE ADMIN MESSAGE
+            Document message = new Document("sender", "admin")
+                    .append("text", answer);
+
+            // PUSH INTO messages ARRAY
             col.updateOne(
-                    eq("_id", new ObjectId(id)),
-                    combine(
-                            set("answer", answer),
-                            set("status", "answered")
-                    )
+                    eq("studentId", studentId),
+                    new Document("$push", new Document("messages", message))
             );
 
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             client.close();
         }
 
-        response.sendRedirect(request.getContextPath() + "/admin");
+        //  Redirect back to queries section
+        response.sendRedirect(request.getContextPath() + "/admin?action=queries");
     }
 }

@@ -161,8 +161,9 @@
 </div>
 
 <!-- QUERIES -->
+<!-- QUERIES -->
 <div id="queries" class="section hidden bg-white p-6 rounded-xl shadow">
-    <h3 class="text-lg font-semibold mb-4">Student Queries</h3>
+    <h3 class="text-lg font-semibold mb-4">Student Queries (Chat)</h3>
 
 <%
 try {
@@ -178,25 +179,85 @@ try {
     List<Document> list = col.find().into(new ArrayList<>());
 
     for(Document q : list){
+
+        List<Document> messages = (List<Document>) q.get("messages");
 %>
 
-<div class="border p-4 mb-3 rounded-lg">
-    <p><b>Student:</b> <%= q.getString("studentId") %></p>
-    <p><b>Query:</b> <%= q.getString("query") %></p>
+<div class="border p-4 mb-4 rounded-lg">
 
-    <p><b>Answer:</b>
-        <%= q.getString("answer") != null ? q.getString("answer") : "Not answered yet" %>
+    <p class="font-bold mb-2">
+        Student ID: <%= q.getString("studentId") %>
     </p>
 
-    <% if (q.getString("answer") == null) { %>
+    <!-- CHAT BOX -->
+    <div class="mb-3">
 
+    <%
+        // ✅ NEW CHAT STRUCTURE
+        if (messages != null) {
+            for (Document m : messages) {
+
+                String sender = m.getString("sender");
+                String text = m.getString("text");
+
+                boolean isAdmin = "admin".equals(sender);
+    %>
+
+        <div style="text-align:<%= isAdmin ? "right" : "left" %>; margin:5px 0;">
+
+            <span style="
+                display:inline-block;
+                padding:8px 12px;
+                border-radius:10px;
+                background-color:<%= isAdmin ? "#bbf7d0" : "#e5e7eb" %>;
+            ">
+
+                <b><%= sender %>:</b> <%= text %>
+
+            </span>
+
+        </div>
+
+    <%
+            }
+        }
+
+        // ✅ FALLBACK FOR OLD DATA
+        else {
+    %>
+
+        <div style="text-align:left; margin:5px 0;">
+            <span style="background:#e5e7eb; padding:8px; border-radius:10px;">
+                <b>student:</b> <%= q.getString("query") %>
+            </span>
+        </div>
+
+        <div style="text-align:right; margin:5px 0;">
+            <span style="background:#bbf7d0; padding:8px; border-radius:10px;">
+                <b>admin:</b> 
+                <%= q.getString("answer") != null ? q.getString("answer") : "Not answered" %>
+            </span>
+        </div>
+
+    <%
+        }
+    %>
+
+    </div>
+
+    <!-- REPLY FORM -->
     <form action="answer" method="post" class="flex gap-2 mt-2">
-        <input type="hidden" name="id" value="<%= q.getObjectId("_id") %>">
-        <input type="text" name="answer" placeholder="Write answer..." class="border p-2 flex-1">
-        <button class="bg-green-500 text-white px-4 rounded">Submit</button>
+        <input type="hidden" name="studentId" value="<%= q.getString("studentId") %>">
+
+        <input type="text" name="answer"
+               placeholder="Reply..."
+               class="border p-2 flex-1 rounded-lg">
+
+        <button class="bg-green-500 text-white px-4 rounded-lg">
+            Send
+        </button>
     </form>
 
-    <% } %>
 </div>
 
 <%

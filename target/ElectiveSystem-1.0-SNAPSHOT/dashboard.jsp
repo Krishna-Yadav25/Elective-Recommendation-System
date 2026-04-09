@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*, org.bson.Document" %>
-
+<%@ page import="java.util.*" %>
+<%@ page import="org.bson.Document" %>
+<%@ page import="static com.mongodb.client.model.Filters.eq" %>
 <%
     String name = (String) session.getAttribute("name");
     String studentId = (String) session.getAttribute("studentId");
@@ -78,6 +79,7 @@
     <button onclick="showSection('answers')" class="btn">My Queries</button>
     <button onclick="showSection('electives')" class="btn">Electives</button>
     <button onclick="showSection('selected')" class="btn">My Electives</button>
+    <button onclick="openSwing()" class="btn">Student Profile</button>
 </div>
 
 <div class="bg-white p-6 rounded-xl shadow">
@@ -194,49 +196,117 @@
 </div>
 
 <!-- QUERY -->
-<div id="query" class="section hidden">
-    <h2 class="text-lg font-semibold mb-4">Ask Query</h2>
+<div id="answers" class="section hidden bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Your Queries (Chat)</h3>
 
-    <form action="query" method="post">
-        <textarea name="query" class="input w-full"></textarea>
-        <button class="btn w-full mt-2">Submit</button>
-    </form>
+<%
+try {
+    com.mongodb.client.MongoClient client =
+        com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+
+    com.mongodb.client.MongoDatabase db =
+        client.getDatabase("electiveDB");
+
+    com.mongodb.client.MongoCollection<Document> col =
+        db.getCollection("queries");
+
+   
+    Document q = col.find(eq("studentId", studentId)).first();
+
+    if(q != null){
+
+        List<Document> messages = (List<Document>) q.get("messages");
+%>
+
+<div style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
+
+<%
+if(messages != null){
+    for(Document m : messages){
+
+        String sender = m.getString("sender");
+        String text = m.getString("text");
+
+        boolean isStudent = "student".equals(sender);
+%>
+
+<div style="text-align:<%= isStudent ? "right" : "left" %>; margin:5px 0;">
+
+    <span style="
+        display:inline-block;
+        padding:8px 12px;
+        border-radius:10px;
+        background-color:<%= isStudent ? "#bfdbfe" : "#bbf7d0" %>;
+    ">
+
+        <b><%= sender %>:</b> <%= text %>
+        <%
+if("admin".equals(sender)){
+%>
+
+<form action="satisfy" method="post" style="margin-top:5px;">
+    <button name="status" value="satisfied"
+        style="background:green;color:white;padding:4px 8px;border-radius:6px;">
+        👍
+    </button>
+
+    <button name="status" value="not_satisfied"
+        style="background:red;color:white;padding:4px 8px;border-radius:6px;">
+        👎
+    </button>
+</form>
+
+<%
+}
+%>
+
+    </span>
+
 </div>
 
-<!-- ANSWERS -->
-<div id="answers" class="section hidden">
-    <h2 class="text-lg font-semibold mb-4">Your Queries</h2>
+<%
+    }
+}
+%>
 
-    <%
-        try {
-            com.mongodb.client.MongoClient client =
-                com.mongodb.client.MongoClients.create("mongodb://localhost:27017");
+</div>
 
-            com.mongodb.client.MongoDatabase db =
-                client.getDatabase("electiveDB");
+<!-- SEND NEW MESSAGE -->
+<form action="query" method="post" class="flex gap-2">
+    <input type="text" name="query"
+           placeholder="Type your question..."
+           class="border p-2 flex-1 rounded-lg">
 
-            com.mongodb.client.MongoCollection<Document> col =
-                db.getCollection("queries");
+    <button class="bg-blue-500 text-white px-4 rounded-lg">
+        Send
+    </button>
+</form>
 
-            List<Document> list =
-                col.find(new Document("studentId", studentId))
-                   .into(new ArrayList<>());
+<%
+    } else {
+%>
 
-            for(Document q : list){
-    %>
+<p>No queries yet.</p>
 
-    <div class="border p-4 mb-3">
-        <p><b>Q:</b> <%= q.getString("query") %></p>
-        <p><b>A:</b> <%= q.getString("answer") != null ? q.getString("answer") : "Pending..." %></p>
-    </div>
+<form action="query" method="post" class="flex gap-2 mt-3">
+    <input type="text" name="query"
+           placeholder="Ask something..."
+           class="border p-2 flex-1 rounded-lg">
 
-    <%
-            }
-            client.close();
-        } catch(Exception e){
-            out.println("Error loading queries");
-        }
-    %>
+    <button class="bg-blue-500 text-white px-4 rounded-lg">
+        Send
+    </button>
+</form>
+
+<%
+    }
+
+    client.close();
+} catch(Exception e){
+    out.println("Error loading queries");
+}
+%>
+
 </div>
 
 <!-- ELECTIVES -->
@@ -329,6 +399,9 @@ function loadCharts() {
             }]
         }
     });
+}
+function openSwing() {
+    window.location.href = "openSwing";
 }
 </script>
 
