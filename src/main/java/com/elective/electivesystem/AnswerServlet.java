@@ -54,6 +54,8 @@ public class AnswerServlet extends HttpServlet {
                     eq("studentId", studentId),
                     new Document("$push", new Document("messages", message))
             );
+            // doPost() mein, col.updateOne() ke baad
+NotificationServlet.push(studentId, "Admin replied to your query", "query");
 
         } catch (Exception e) {
             e.printStackTrace();
