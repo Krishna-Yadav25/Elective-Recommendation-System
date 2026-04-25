@@ -31,7 +31,7 @@ public class UploadPhotoServlet extends HttpServlet {
         // Get uploaded file
        Part filePart = request.getPart("photo");
 
-// ✅ Check if file selected or not
+
 if (filePart == null || filePart.getSize() == 0 || filePart.getSubmittedFileName().isEmpty()) {
     response.sendRedirect("dashboard.jsp");
     return;

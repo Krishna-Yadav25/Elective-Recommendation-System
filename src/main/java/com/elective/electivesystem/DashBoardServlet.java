@@ -5,112 +5,7 @@
 
 
 
-//package com.elective.electivesystem;
-//
-//import java.io.*;
-//import javax.servlet.*;
-//import javax.servlet.http.*;
-//import javax.servlet.annotation.*;
-//
-//import com.mongodb.client.*;
-//import org.bson.Document;
-//import static com.mongodb.client.model.Filters.eq;
-//
-//@WebServlet("/dashboard")
-//public class DashBoardServlet extends HttpServlet {
-//
-//    //  SAVE FORM DATA
-//    @Override
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        HttpSession session = request.getSession(false);
-//
-//        // Session check
-//        if (session == null || session.getAttribute("studentId") == null) {
-//            response.sendRedirect("index.jsp");
-//            return;
-//        }
-//
-//        String studentId = (String) session.getAttribute("studentId");
-//
-//        //  Get form data (NORMAL FORM - NO multipart)
-//        String branch = request.getParameter("branch");
-//        String semester = request.getParameter("semester");
-//        String tenth = request.getParameter("tenth");
-//        String twelfth = request.getParameter("twelfth");
-//        String cgpa = request.getParameter("cgpa");
-//        String codingLevel = request.getParameter("codingLevel");
-//        String goal = request.getParameter("goal");
-//
-//        //  MongoDB Connection
-//        MongoClient client = MongoClients.create("mongodb://localhost:27017");
-//        MongoDatabase db = client.getDatabase("electiveDB");
-//        MongoCollection<Document> col = db.getCollection("student_profile");
-//
-//        //  Create document
-//        Document doc = new Document("studentId", studentId)
-//                .append("branch", branch)
-//                .append("semester", semester)
-//                .append("tenth", tenth)
-//                .append("twelfth", twelfth)
-//                .append("cgpa", cgpa)
-//                .append("codingLevel", codingLevel)
-//                .append("goal", goal);
-//
-//        //  Insert / Update (Upsert)
-//        col.replaceOne(eq("studentId", studentId), doc,
-//                new com.mongodb.client.model.ReplaceOptions().upsert(true));
-//
-//        client.close();
-//
-//        //  Redirect back
-//        response.sendRedirect(request.getContextPath() + "/dashboard");
-//    }
-//
-//
-//    //  LOAD DATA ON DASHBOARD
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        HttpSession session = request.getSession(false);
-//
-//        if (session == null || session.getAttribute("studentId") == null) {
-//            response.sendRedirect("index.jsp");
-//            return;
-//        }
-//
-//        String studentId = (String) session.getAttribute("studentId");
-//
-//        //  MongoDB fetch
-//        MongoClient client = MongoClients.create("mongodb://localhost:27017");
-//        MongoDatabase db = client.getDatabase("electiveDB");
-//        MongoCollection<Document> col = db.getCollection("student_profile");
-//        
-//MongoCollection<Document> electiveCol = db.getCollection("electives");
-//long electiveCount = electiveCol.countDocuments();
-//
-//
-//request.setAttribute("electiveCount", electiveCount);
-//
-//        Document user = col.find(eq("studentId", studentId)).first();
-//
-//        if (user != null) {
-//            request.setAttribute("branch", user.getString("branch"));
-//            request.setAttribute("semester", user.getString("semester"));
-//            request.setAttribute("tenth", user.getString("tenth"));
-//            request.setAttribute("twelfth", user.getString("twelfth"));
-//            request.setAttribute("cgpa", user.getString("cgpa"));
-//            request.setAttribute("codingLevel", user.getString("codingLevel"));
-//            request.setAttribute("goal", user.getString("goal"));
-//        }
-//
-//        client.close();
-//
-//        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-//    }
-//}
+
 
 package com.elective.electivesystem;
 
@@ -126,7 +21,7 @@ import static com.mongodb.client.model.Filters.eq;
 @WebServlet("/dashboard")
 public class DashBoardServlet extends HttpServlet {
 
-    // ── POST: Save form data ───────────────────────────────────────────────
+    // ── POST: Save form data 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -170,23 +65,22 @@ public class DashBoardServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            // On error, go back to dashboard with error flag
+            
             response.sendRedirect(request.getContextPath() + "/dashboard?error=true");
             return;
         }
 
-        // FIX 1: Update session so stat cards on JSP show new values immediately
+        
         session.setAttribute("branch",      branch);
         session.setAttribute("semester",    semester);
         session.setAttribute("cgpa",        cgpa);
         session.setAttribute("codingLevel", codingLevel);
         session.setAttribute("goal",        goal);
 
-        // FIX 2: Pass saved=true so JSP can show a success toast
+        
         response.sendRedirect(request.getContextPath() + "/dashboard?saved=true");
     }
 
-    // ── GET: Load dashboard with pre-filled data ───────────────────────────
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -208,7 +102,7 @@ public class DashBoardServlet extends HttpServlet {
             Document user = col.find(eq("studentId", studentId)).first();
 
             if (user != null) {
-                // FIX 3: Set request attributes so JSP form fields are pre-filled
+                
                 request.setAttribute("branch",      nullSafe(user.getString("branch")));
                 request.setAttribute("semester",    nullSafe(user.getString("semester")));
                 request.setAttribute("tenth",       nullSafe(user.getString("tenth")));
@@ -238,7 +132,7 @@ public class DashBoardServlet extends HttpServlet {
         request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
 
-    // ── Helper: treat null as empty string ────────────────────────────────
+   
     private String nullSafe(String val) {
         return val != null ? val.trim() : "";
     }

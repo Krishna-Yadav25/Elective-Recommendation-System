@@ -38,12 +38,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 .feat-icon svg{width:15px;height:15px}
 .feat-text{font-size:13px;color:rgba(255,255,255,.8);font-weight:500}
 
-/* Stats row */
-.stats-row{display:flex;gap:28px;margin-top:44px;padding-top:32px;border-top:1px solid rgba(255,255,255,.12)}
-.stat-item{display:flex;flex-direction:column;gap:3px}
-.stat-val{font-size:22px;font-weight:800;color:#fff}
-.stat-lbl{font-size:11px;color:rgba(255,255,255,.5);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-
 /* RIGHT PANEL */
 .right{flex:1;display:flex;justify-content:center;align-items:center;padding:40px 48px;background:#f0f2ff;position:relative}
 .right::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:#EEEDFE;top:-80px;right:-80px;z-index:0}
@@ -84,6 +78,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 /* Error */
 .error-box{display:flex;align-items:center;gap:8px;background:#FEE2E2;border:1px solid #FECACA;border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#991B1B}
 .error-box svg{width:14px;height:14px;flex-shrink:0}
+
+/* Success */
+.success-box{display:flex;align-items:center;gap:8px;background:#DCFCE7;border:1px solid #BBF7D0;border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#166534}
+
+/* Forgot password */
+.forgot-row{text-align:right;margin-top:-6px;margin-bottom:14px}
+.forgot-row a{font-size:12px;color:#534AB7;font-weight:600;text-decoration:none}
+.forgot-row a:hover{text-decoration:underline}
 
 /* Submit button */
 .btn-submit{width:100%;padding:11px;background:#534AB7;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s,transform .1s;margin-top:6px;letter-spacing:.01em}
@@ -130,13 +132,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
         A smart system that matches your academic profile with the best-fit electives — powered by your CGPA, interests, and career goals.
     </div>
 
-<!--    <div class="features">
-        <div class="feat">
-            <div class="feat-icon">
-                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L9.8 6.2H14L10.6 8.8 11.8 13 8 10.4 4.2 13 5.4 8.8 2 6.2H6.2Z" stroke="white" stroke-width="1.2" fill="none" stroke-linejoin="round"/></svg>
-            </div>
-            <span class="feat-text">AI-powered elective recommendations</span>
-        </div>-->
+    <div class="features">
         <div class="feat">
             <div class="feat-icon">
                 <svg viewBox="0 0 16 16" fill="none"><path d="M2 12L5 8L8 10L11 5L14 7" stroke="white" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -150,21 +146,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
             <span class="feat-text">Direct chat support with admin</span>
         </div>
     </div>
-
-<!--    <div class="stats-row">
-        <div class="stat-item">
-            <span class="stat-val">50+</span>
-            <span class="stat-lbl">Electives</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-val">500+</span>
-            <span class="stat-lbl">Students</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-val">98%</span>
-            <span class="stat-lbl">Satisfaction</span>
-        </div>
-    </div>-->
 </div>
 
 <!-- RIGHT PANEL -->
@@ -187,7 +168,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
         <div class="card-title">Welcome back</div>
         <div class="card-sub">Sign in to continue to your dashboard</div>
 
-        <!-- Error message -->
+        <%-- ✅ Password reset success message --%>
+        <%
+            String resetSuccess = request.getParameter("reset");
+            if("success".equals(resetSuccess)){
+        %>
+        <div class="success-box">
+            ✓ &nbsp;Password reset successfully! Please sign in.
+        </div>
+        <% } %>
+
+        <%-- ✅ Login error message --%>
         <%
             String error = (String) request.getAttribute("error");
             if(error != null){
@@ -242,6 +233,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
                     <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
                     <input type="password" name="password" placeholder="Enter your password" required>
                 </div>
+            </div>
+
+            <%-- ✅ Forgot Password link --%>
+            <div class="forgot-row">
+                <a href="forgot-password.jsp">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn-submit">Sign In</button>

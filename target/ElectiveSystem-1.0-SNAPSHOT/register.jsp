@@ -183,6 +183,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
         <form action="register" method="post" onsubmit="return validate()" id="regForm">
             <div class="form-grid">
 
+                <!-- FULL NAME -->
                 <div class="field full">
                     <label>Full Name</label>
                     <div class="input-wrap">
@@ -192,6 +193,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
                     <span class="field-error" id="err-name">Name cannot be empty</span>
                 </div>
 
+                <!-- STUDENT ID -->
                 <div class="field full">
                     <label>Student ID</label>
                     <div class="input-wrap">
@@ -200,6 +202,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
                     </div>
                 </div>
 
+                <!-- ✅ EMAIL — NEW FIELD -->
+                <div class="field full">
+                    <label>Email Address</label>
+                    <div class="input-wrap">
+                        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 5l6 5 6-5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                        <input type="email" name="email" id="femail" placeholder="Enter your email address" required>
+                    </div>
+                    <span class="field-error" id="err-email">Please enter a valid email</span>
+                </div>
+
+                <!-- PASSWORD -->
                 <div class="field">
                     <label>Password</label>
                     <div class="input-wrap">
@@ -211,6 +224,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
                     <span class="field-error" id="err-pwd">Minimum 6 characters required</span>
                 </div>
 
+                <!-- CONFIRM PASSWORD -->
                 <div class="field">
                     <label>Confirm Password</label>
                     <div class="input-wrap">
@@ -241,9 +255,9 @@ function checkStrength(val) {
     if (val.length < 6)   { fill.style.width='50%'; fill.style.background='#f97316'; hint.textContent='Weak'; return; }
     const strong = /[A-Z]/.test(val) && /[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val);
     const medium = /[A-Z]/.test(val) || /[0-9]/.test(val);
-    if (strong) { fill.style.width='100%'; fill.style.background='#1D9E75'; hint.textContent='Strong password'; }
-    else if (medium) { fill.style.width='70%'; fill.style.background='#BA7517'; hint.textContent='Medium — add numbers or symbols'; }
-    else { fill.style.width='55%'; fill.style.background='#f97316'; hint.textContent='Weak — try mixing cases'; }
+    if (strong)      { fill.style.width='100%'; fill.style.background='#1D9E75'; hint.textContent='Strong password'; }
+    else if (medium) { fill.style.width='70%';  fill.style.background='#BA7517'; hint.textContent='Medium — add numbers or symbols'; }
+    else             { fill.style.width='55%';  fill.style.background='#f97316'; hint.textContent='Weak — try mixing cases'; }
 }
 
 function showErr(id, inputId) {
@@ -257,14 +271,19 @@ function clearErr(id, inputId) {
 
 function validate() {
     let ok = true;
-    const name = document.getElementById('fname').value.trim();
-    const pwd  = document.getElementById('fpwd').value;
-    const conf = document.getElementById('fconf').value;
+    const name  = document.getElementById('fname').value.trim();
+    const email = document.getElementById('femail').value.trim();
+    const pwd   = document.getElementById('fpwd').value;
+    const conf  = document.getElementById('fconf').value;
 
-    clearErr('err-name','fname'); clearErr('err-pwd','fpwd'); clearErr('err-conf','fconf');
+    clearErr('err-name','fname');
+    clearErr('err-email','femail');
+    clearErr('err-pwd','fpwd');
+    clearErr('err-conf','fconf');
 
-    if (name === '') { showErr('err-name','fname'); ok = false; }
-    if (pwd.length < 6) { showErr('err-pwd','fpwd'); ok = false; }
+    if (name === '')  { showErr('err-name','fname');   ok = false; }
+    if (email === '') { showErr('err-email','femail'); ok = false; }
+    if (pwd.length < 6) { showErr('err-pwd','fpwd');  ok = false; }
     if (pwd !== conf)   { showErr('err-conf','fconf'); ok = false; }
     return ok;
 }
