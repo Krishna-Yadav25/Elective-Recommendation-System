@@ -33,7 +33,8 @@ public class FeedbackServlet extends HttpServlet {
         }
 
         try {
-            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+            String mongoUri=System.getenv("MONGO_URI");
+            MongoClient client =MongoClients.create(mongoUri);
             MongoDatabase db   = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("feedback");
 

@@ -46,7 +46,9 @@ public class DashBoardServlet extends HttpServlet {
         String stream      = nullSafe(request.getParameter("stream"));
 
         // Save to MongoDB
-        try (MongoClient client = MongoClients.create("mongodb://localhost:27017")) {
+        String mongoUri = System.getenv("MONGO_URI");
+     
+        try (MongoClient client =MongoClients.create(mongoUri)) {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("student_profile");
 
@@ -93,8 +95,8 @@ public class DashBoardServlet extends HttpServlet {
         }
 
         String studentId = (String) session.getAttribute("studentId");
-
-        try (MongoClient client = MongoClients.create("mongodb://localhost:27017")) {
+String mongoUri = System.getenv("MONGO_URI");
+        try (MongoClient client =MongoClients.create(mongoUri)) {
             MongoDatabase db = client.getDatabase("electiveDB");
 
             // Load student profile

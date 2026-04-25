@@ -27,7 +27,8 @@ public class SatisfyServlet extends HttpServlet {
 
         String status = request.getParameter("status");
 
-        MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0");
+      String mongoUri=System.getenv("MONGO_URI");
+           MongoClient client =MongoClients.create(mongoUri);
 
         try {
             MongoDatabase db = client.getDatabase("electiveDB");

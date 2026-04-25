@@ -57,7 +57,8 @@ if (filePart == null || filePart.getSize() == 0 || filePart.getSubmittedFileName
         String studentId = (String) session.getAttribute("studentId");
 
         // MongoDB connection
-        MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0");
+        String mongoUri=System.getenv("MONGO_URI");
+           MongoClient client =MongoClients.create(mongoUri);
         MongoDatabase db = client.getDatabase("electiveDB");
         MongoCollection<Document> col = db.getCollection("users");
 

@@ -36,7 +36,8 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
-        MongoClient client = MongoClients.create("mongodb://localhost:27017");
+      String mongoUri = System.getenv("MONGO_URI");
+      MongoClient client = MongoClients.create(mongoUri);
 
         try {
             MongoDatabase db = client.getDatabase("electiveDB");
@@ -90,7 +91,8 @@ public class AdminServlet extends HttpServlet {
             action = "load";
         }
 
-        MongoClient client = MongoClients.create("mongodb://localhost:27017");
+      String mongoUri = System.getenv("MONGO_URI");
+      MongoClient client = MongoClients.create(mongoUri);
 
         try {
             MongoDatabase db = client.getDatabase("electiveDB");

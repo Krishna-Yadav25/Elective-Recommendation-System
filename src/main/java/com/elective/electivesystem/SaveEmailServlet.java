@@ -28,8 +28,9 @@ public class SaveEmailServlet extends HttpServlet {
             request.getRequestDispatcher("add-email.jsp").forward(request, response);
             return;
         }
-
-        try (MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0")) {
+            String mongoUri=System.getenv("MONGO_URI");
+           
+        try (MongoClient client =MongoClients.create(mongoUri)) {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("users");
 

@@ -16,8 +16,9 @@ public class VerifyOtpServlet extends HttpServlet {
 
         String email = request.getParameter("email");
         String otp   = request.getParameter("otp");
-
-        try (MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0")) {
+             String mongoUri=System.getenv("MONGO_URI");
+           
+        try (MongoClient client =MongoClients.create(mongoUri)) {
             MongoDatabase db = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("users");
 

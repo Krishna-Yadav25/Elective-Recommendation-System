@@ -31,7 +31,8 @@ public class AnnouncementServlet extends HttpServlet {
         }
 
         try {
-            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+          String mongoUri = System.getenv("MONGO_URI");
+      MongoClient client = MongoClients.create(mongoUri);
             MongoDatabase db   = client.getDatabase("electiveDB");
             MongoCollection<Document> col = db.getCollection("announcements");
 
@@ -68,7 +69,8 @@ public class AnnouncementServlet extends HttpServlet {
         if (id == null) { response.setStatus(400); return; }
 
         try {
-            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+            String mongoUri = System.getenv("MONGO_URI");
+      MongoClient client = MongoClients.create(mongoUri);
             client.getDatabase("electiveDB")
                   .getCollection("announcements")
                   .deleteOne(new Document("_id", new org.bson.types.ObjectId(id)));
