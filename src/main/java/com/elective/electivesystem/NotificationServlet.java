@@ -25,7 +25,7 @@ public class NotificationServlet extends HttpServlet {
         String action    = request.getParameter("action");
 
         try {
-            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+            MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0");
             MongoCollection<Document> col =
                 client.getDatabase("electiveDB").getCollection("notifications");
 
@@ -56,7 +56,7 @@ public class NotificationServlet extends HttpServlet {
     }
     public static void push(String studentId, String message, String type) {
         try {
-            MongoClient client = MongoClients.create("mongodb://localhost:27017");
+            MongoClient client = MongoClients.create("mongodb+srv://yadavkkrishna005_db_user:08IqQu4F1dUXlkao@cluster0.wfbiz1o.mongodb.net/electiveDB?appName=Cluster0");
             MongoCollection<Document> col =
                 client.getDatabase("electiveDB").getCollection("notifications");
 
